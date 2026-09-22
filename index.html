@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>영백티쳐 수학 방탈출</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;600;700&family=East+Sea+Dokdo&family=Jua&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0d10;--card:#1a181d;--ink:#e4dfd2;--dim:#8e887c;--line:rgba(228,223,210,.16);--red:#c0402f;--mint:#7fa38a;--sky:#2b7bc9}
+*{box-sizing:border-box;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{background:var(--bg);background-image:radial-gradient(ellipse at 50% -10%,rgba(150,180,150,.10),transparent 55%);color:var(--ink);font-family:'IBM Plex Sans KR',system-ui,sans-serif;line-height:1.6;min-height:100vh}
+main{max-width:760px;margin:0 auto;padding:36px 18px 48px}
+h1{font-family:'East Sea Dokdo','IBM Plex Sans KR',sans-serif;font-weight:400;font-size:clamp(2.8rem,11vw,4rem);line-height:1;color:#ddd6c6;text-shadow:0 0 14px rgba(192,64,47,.35)}
+.lead{color:var(--dim);margin-top:10px}
+h2{font-size:.85rem;font-weight:600;color:var(--dim);letter-spacing:.12em;margin:34px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+a.g{display:block;text-decoration:none;color:inherit;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:16px 16px 14px;transition:border-color .15s,transform .15s}
+a.g:hover,a.g:focus-visible{border-color:var(--red);transform:translateY(-2px);outline:none}
+.tag{display:inline-block;font-size:.74rem;font-weight:700;padding:2px 9px;border-radius:999px;border:1px solid var(--line);color:var(--dim)}
+.tag.m2{border-color:#7fa38a;color:#9fc3aa}.tag.m3{border-color:#c0402f;color:#e8a197}.tag.k{border-color:#8fc3ee;color:#8fc3ee}
+.g h3{font-size:1.15rem;margin:8px 0 4px;line-height:1.35}
+.g p{font-size:.88rem;color:var(--dim)}
+.g .meta{font-size:.78rem;color:var(--dim);margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+a.g.kid{background:linear-gradient(#1b2530,#1a181d)}
+a.g.kid h3{font-family:'Jua',sans-serif;font-weight:400;color:#bfe1ff}
+footer{margin-top:40px;font-size:.8rem;color:var(--dim)}
+</style>
+</head>
+<body>
+<main>
+  <h1>수학 방탈출</h1>
+  <p class="lead">문제를 풀어 잠긴 문을 열고 탈출하는 수업용 게임입니다. 선생님이 관제실에서 수업을 만들면, 학생은 코드나 QR로 들어옵니다.</p>
+
+  <h2>중학교 수업용</h2>
+  <div class="grid">
+    <a class="g" href="triquad-escape/"><span class="tag m2">중2 · 개인전</span><h3>진해중 폐교 탈출<br>삼각형과 사각형</h3>
+      <p>이등변삼각형, 직각삼각형의 합동, 내심, 평행사변형</p><div class="meta">학생마다 다른 숫자 · 오답 분석</div></a>
+    <a class="g" href="trig-escape/"><span class="tag m3">중3 · 개인전</span><h3>진해중 폐교 탈출<br>삼각비</h3>
+      <p>삼각비의 뜻, 특수각, 높이 측량, 둔각삼각형의 넓이</p><div class="meta">학생마다 다른 숫자 · 오답 분석</div></a>
+    <a class="g" href="dameum-escape/"><span class="tag m2">중2 · 조별 협동</span><h3>닮음 방탈출<br>설계도의 비밀</h3>
+      <p>조원마다 다른 단서를 모아 함께 푸는 협동 방탈출</p><div class="meta">조별 단서 나누기</div></a>
+  </div>
+
+  <h2>초등 · 유치원</h2>
+  <div class="grid">
+    <a class="g kid" href="kids-escape/"><span class="tag k">초등 3~4학년</span><h3>하늘빛 폐교 탈출</h3>
+      <p>세 자리 수 덧셈·뺄셈, 두 자리 수 곱셈</p><div class="meta">학생마다 다른 숫자 · 순한 공포</div></a>
+    <a class="g kid" href="kinder-escape/"><span class="tag k">유치원</span><h3>하늘빛 유치원 탈출</h3>
+      <p>한 자리 수 덧셈·뺄셈, 구구단 2단</p><div class="meta">그림으로 세기 · 숫자판 입력</div></a>
+  </div>
+  <footer>진해중학교 영백티쳐 · 테스트 모드 비밀번호는 선생님께 문의하세요</footer>
+</main>
+</body>
+</html>
