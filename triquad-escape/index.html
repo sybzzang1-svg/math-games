@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>삼각형과 사각형 방탈출 · 기하학자의 서재</title>
+<title>진해중 폐교 탈출 · 삼각형과 사각형</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;600;700&family=East+Sea+Dokdo&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 /* ============================================================
@@ -190,8 +190,60 @@ input.t:focus{border-color:var(--chalk)}
 .ph{display:inline-flex;gap:4px}.ph button{width:30px}
 @media (max-width:560px){.dist{grid-template-columns:repeat(3,1fr)}}
 </style>
+<style>
+/* ===== 폐교 공포 테마 ===== */
+:root{--paper:#141214;--paper-deep:#0A090B;--paper-hi:#1C1A1E;--chalk:#E4DFD2;--chalk-dim:#8E887C;--line:rgba(228,223,210,.16);
+  --amber:#C29A55;--mint:#7FA38A;--coral:#C0402F;--blood:#8C1F17}
+body{background:#0A090B;background-image:radial-gradient(ellipse at 50% -10%,rgba(150,180,150,.10),transparent 55%),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 2px,transparent 2px 120px),linear-gradient(#0e0d10,#070608);background-size:auto}
+#app{position:relative;z-index:1;transition:opacity .15s}
+#fx-vig{position:fixed;inset:0;pointer-events:none;z-index:30;background:radial-gradient(ellipse at center,transparent 58%,rgba(0,0,0,.5) 100%)}
+#fx-grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:31;opacity:.07;animation:grain .5s steps(4) infinite}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}100%{transform:translate(1%,3%)}}
+#fx-flash{position:fixed;inset:0;pointer-events:none;z-index:60;background:#5e0c08;opacity:0;transition:opacity .09s}
+#fx-flash.on{opacity:.6}
+body.blackout #app{opacity:.05;transition:none}
+body.shake #app{animation:shake .45s}
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(5px)}30%,50%,70%{transform:translateX(-9px)}40%,60%{transform:translateX(9px)}}
+.hero h1{font-family:'East Sea Dokdo','IBM Plex Sans KR',sans-serif;font-weight:400;font-size:clamp(3.2rem,13vw,4.8rem);line-height:1;letter-spacing:0;
+  color:#ddd6c6;text-shadow:0 0 14px rgba(192,64,47,.45);animation:flick 7s infinite}
+@keyframes flick{0%,18%,22%,60%,63%,100%{opacity:1}20%,61.5%{opacity:.35}}
+.hero-img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:6px;margin-bottom:18px}
+.roomtitle{font-family:'East Sea Dokdo','IBM Plex Sans KR',sans-serif;font-weight:400;font-size:2.3rem;letter-spacing:0;line-height:1.05;color:#e0d8c8}
+.scene{margin:10px 0 2px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#080709}
+.scene svg{display:block;width:100%;height:auto}
+.win-lit{animation:winlit 5s infinite}
+@keyframes winlit{0%,40%,44%,100%{opacity:.55}42%{opacity:.08}}
+/* 단서 = 누렇게 바랜 종이 */
+.clue{background:#D6CCB2;background-image:radial-gradient(circle at 18% 22%,rgba(120,90,40,.18),transparent 30%),radial-gradient(circle at 82% 70%,rgba(90,60,30,.16),transparent 35%),linear-gradient(#DCD3BA,#CFC4A8);
+  border-color:#8a7f66;color:#221E19}
+.clue .tag{color:#8C1F17;font-family:'Nanum Pen Script','IBM Plex Sans KR',sans-serif;font-size:1.35rem;font-weight:400;letter-spacing:0}
+.clue .body{color:#221E19}
+.clue .dim,.clue .small.dim{color:#5c5445}
+.fig text{fill:#221E19}.fig .ln{stroke:#2a2520}.fig .hl{stroke:#9E2A20}.fig .aux{stroke:#6b6252}.fig .dot{fill:#2a2520}
+.btn.primary{background:#8C1F17;border-color:#8C1F17;color:#F1E9DA}
+.btn{border-color:#8e887c}
+.seg button[aria-pressed=true]{border-color:#C0402F;background:rgba(192,64,47,.16);color:#e8a197}
+.sheet,.lock{border-color:#6b655a}
+.dots i.done{background:#7FA38A;border-color:#7FA38A}
+.dots i.now{border-color:#C0402F;background:rgba(192,64,47,.35)}
+.lbar i.got{color:#d04a37;border-color:#8C1F17;background:rgba(140,31,23,.18);font-family:'East Sea Dokdo',sans-serif;font-size:1.6rem;font-weight:400}
+.tile{border-color:#8C1F17;background:rgba(40,8,6,.25)}
+.tile b{color:#C0402F;font-family:'East Sea Dokdo',sans-serif;font-weight:400;font-size:3rem}
+.tile span{color:#5c5445}
+.unlock{background:rgba(6,5,7,.95)}
+.unlock .ring{border-color:#7FA38A;color:#7FA38A}
+.unlock .got b{font-family:'East Sea Dokdo',sans-serif;font-weight:400;color:#C0402F;border-color:#8C1F17;font-size:3.4rem}
+.hint{border-left-color:#7FA38A;background:rgba(127,163,138,.10)}
+.banner{border-color:#C29A55;color:#C29A55}
+.snd{background:transparent;border:1px solid var(--line);border-radius:6px;padding:3px 9px;font-size:1rem;line-height:1.2;color:var(--chalk)}
+body.dawn{background:#3a2e36;background-image:linear-gradient(#1d1824,#5a4048 55%,#b58a62)}
+body.dawn #fx-vig{opacity:.4}
+@media (prefers-reduced-motion:reduce){.hero h1,.win-lit,#fx-grain{animation:none}body.shake #app{animation:none}}
+</style>
 </head>
 <body>
+<div id="fx-grain" aria-hidden="true"></div><div id="fx-vig" aria-hidden="true"></div><div id="fx-flash" aria-hidden="true"></div>
 <div id="app"></div>
 <div id="layer"></div>
 
@@ -228,76 +280,76 @@ const F = {
 };
 
 const STAGES = [
-  { title:'첫 번째 문 · 겹쳐진 이등변삼각형',
-    story:'서재 문에 삼각형 두 개가 겹쳐 새겨져 있다. 각 하나가 지워져 있다.',
+  { title:'첫 번째 문 · 2학년 3반 교실', scene:'cls',
+    story:'복도 끝 2학년 3반. 칠판에 누군가 붉은 분필로 삼각형 두 개를 겹쳐 그려 놓았다. 각 하나가 지워져 있고, 교실 문은 안에서 잠겨 있다.',
     q:'∠ABD의 크기는 몇 도일까?', unit:'°', ans:{n:30}, letter:'각',
     cards:[
-      {tag:'문의 그림', body:'점 D는 변 AC 위의 점이다.<br><span class="small dim">그림은 실제 크기와 다를 수 있다.</span>', fig:'r1'},
-      {tag:'새겨진 글 ①', body:'AB = AC'},
-      {tag:'새겨진 글 ②', body:'BD = BC'},
-      {tag:'측량 기록', body:'∠A = 40°'},
-      {tag:'낡은 교본', body:'이등변삼각형에서 길이가 같은 두 변의 맞은편에 있는 두 각의 크기는 같다.'}],
+      {tag:'칠판의 그림', body:'점 D는 변 AC 위의 점이다.<br><span class="small dim">그림은 실제 크기와 다를 수 있다.</span>', fig:'r1'},
+      {tag:'칠판 구석의 낙서', body:'AB = AC'},
+      {tag:'책상 속 쪽지', body:'BD = BC'},
+      {tag:'분필로 쓴 숫자', body:'∠A = 40°'},
+      {tag:'찢어진 교과서 한 쪽', body:'이등변삼각형에서 길이가 같은 두 변의 맞은편에 있는 두 각의 크기는 같다.'}],
     hints:['BD = BC이므로 △BDC도 이등변삼각형입니다. 크기가 같은 두 각은 ∠DBC가 아니라 ∠BDC와 ∠BCD입니다.',
            '∠C = 70°이므로 ∠BDC = 70°, ∠DBC = 40°입니다. ∠ABC에서 ∠DBC를 빼 보세요.'],
     explain:'<b>풀이</b> ∠ABC = ∠C = (180° − 40°) ÷ 2 = 70°. △BDC에서 ∠BDC = ∠BCD = 70°이므로 ∠DBC = 40°. ∠ABD = 70° − 40° = 30°' },
 
-  { title:'두 번째 문 · 각을 나누는 선',
-    story:'직각삼각형 모양의 선반. 누군가 꼭짓점 A에서 선을 그어 각을 똑같이 나눠 놓았다.',
+  { title:'두 번째 문 · 과학실', scene:'sci',
+    story:'과학실 선반 하나가 벽에 기대어 직각삼각형 모양으로 쓰러져 있다. 누군가 꼭짓점 A에서 선을 그어 각을 똑같이 나눠 놓았다. 표본 병 속에서 무언가 움직인 것 같다.',
     q:'△ACD와 △AED는 합동이다. 합동 조건과 선분 CD의 길이는?', unit:'', ans:{cond:'RHA', n:3}, cond:true, letter:'정',
     condLabel:'합동 조건', condOpts:['RHA','RHS','SAS'], numLabel:'선분 CD의 길이',
     cards:[
-      {tag:'선반 그림', body:'D는 변 BC 위, E는 변 AB 위의 점이다.', fig:'r2'},
-      {tag:'측량 기록 ①', body:'∠C = 90°<br>DE ⊥ AB'},
-      {tag:'측량 기록 ②', body:'AD는 ∠A의 이등분선'},
-      {tag:'측량 기록 ③', body:'AC = 6<br>AB = 10'},
-      {tag:'측량 기록 ④', body:'BC = 8'}],
+      {tag:'쓰러진 선반', body:'D는 변 BC 위, E는 변 AB 위의 점이다.', fig:'r2'},
+      {tag:'실험 노트 ①', body:'∠C = 90°<br>DE ⊥ AB'},
+      {tag:'실험 노트 ②', body:'AD는 ∠A의 이등분선'},
+      {tag:'실험 노트 ③', body:'AC = 6<br>AB = 10'},
+      {tag:'실험 노트 ④', body:'BC = 8'}],
     hints:['두 삼각형은 빗변 AD를 함께 쓰고, ∠CAD = ∠EAD 입니다. 빗변과 한 예각이 같습니다.',
            'CD = DE = x라 두면, △ABC의 넓이 = △ACD + △ABD 입니다. ½ × 6 × x + ½ × 10 × x = ½ × 6 × 8'],
     explain:'<b>풀이</b> 빗변 AD 공통, ∠CAD = ∠EAD → RHA 합동, 따라서 CD = DE. CD = x라 하면 3x + 5x = 24 → x = 3' },
 
-  { title:'세 번째 문 · 세 선이 만나는 점',
-    story:'천장의 삼각형 문양. 세 꼭짓점에서 뻗은 선이 한 점에서 만난다.',
+  { title:'세 번째 문 · 도서실', scene:'lib',
+    story:'불 꺼진 도서실. 천장에 삼각형 문양이 있고, 세 꼭짓점에서 뻗은 선이 한 점에서 만난다. 아무도 없는 서가 사이에서 책장 넘기는 소리가 들린다.',
     q:'∠BPC의 크기는 몇 도일까?', unit:'°', ans:{n:125}, letter:'형',
     cards:[
-      {tag:'천장 그림', body:'삼각형 안의 점 P', fig:'r3'},
-      {tag:'기록 ①', body:'점 P는 △ABC의 세 내각의 이등분선의 교점이다.'},
-      {tag:'기록 ②', body:'∠BAC = 70°'},
-      {tag:'기록 ③', body:'∠PBA = ∠PBC<br>∠PCA = ∠PCB'},
-      {tag:'낡은 교본', body:'삼각형의 세 내각의 크기의 합은 180°'}],
+      {tag:'천장의 문양', body:'삼각형 안의 점 P', fig:'r3'},
+      {tag:'대출 카드', body:'점 P는 △ABC의 세 내각의 이등분선의 교점이다.'},
+      {tag:'책갈피 메모', body:'∠BAC = 70°'},
+      {tag:'반납함 쪽지', body:'∠PBA = ∠PBC<br>∠PCA = ∠PCB'},
+      {tag:'사서 선생님의 메모', body:'삼각형의 세 내각의 크기의 합은 180°'}],
     hints:['세 내각의 이등분선이 만나는 점은 외심이 아니라 내심입니다.',
            '∠PBC + ∠PCB = ½ × (∠B + ∠C) = ½ × (180° − 70°)'],
     explain:'<b>풀이</b> ∠B + ∠C = 110°이므로 ∠PBC + ∠PCB = 55°. ∠BPC = 180° − 55° = 125°. (내심은 ∠BPC = 90° + ½∠A)' },
 
-  { title:'네 번째 문 · 평행사변형 창문',
-    story:'마지막 문은 평행사변형 모양의 창문이다. 꼭짓점 A에서 그은 선이 아랫변과 만난다.',
+  { title:'네 번째 문 · 교무실', scene:'off',
+    story:'교무실 창문이 평행사변형으로 비틀려 있다. 꼭짓점 A에서 그은 붉은 선이 아랫변과 만난다. 책상 위에 누군가의 출석부가 펼쳐져 있다.',
     q:'선분 EC의 길이는?', unit:'', ans:{n:4}, letter:'사',
     cards:[
-      {tag:'창문 그림', body:'점 E는 변 BC 위의 점이다.<br><span class="small dim">그림은 실제 크기와 다를 수 있다.</span>', fig:'r4'},
-      {tag:'기록 ①', body:'□ABCD는 평행사변형이다.'},
-      {tag:'기록 ②', body:'AE는 ∠A의 이등분선'},
-      {tag:'기록 ③', body:'AB = 6'},
-      {tag:'기록 ④', body:'AD = 10'}],
+      {tag:'비틀린 창문', body:'점 E는 변 BC 위의 점이다.<br><span class="small dim">그림은 실제 크기와 다를 수 있다.</span>', fig:'r4'},
+      {tag:'출석부 ①', body:'□ABCD는 평행사변형이다.'},
+      {tag:'출석부 ②', body:'AE는 ∠A의 이등분선'},
+      {tag:'출석부 ③', body:'AB = 6'},
+      {tag:'출석부 ④', body:'AD = 10'}],
     hints:['AD ∥ BC이므로 ∠DAE와 ∠AEB는 엇각으로 크기가 같습니다.',
            '△ABE는 BA = BE인 이등변삼각형입니다. EC = BC − BE'],
     explain:'<b>풀이</b> ∠BAE = ∠DAE = ∠AEB(엇각) → △ABE는 이등변삼각형, BE = AB = 6. BC = AD = 10이므로 EC = 10 − 6 = 4' },
 
-  { title:'마지막 금고 · 네 글자 자물쇠', vault:true,
-    story:'서재 출구 옆에 네 칸짜리 글자 자물쇠가 달린 금고가 있다. 문을 열 때마다 얻은 글자를 꺼내 본다.',
+  { title:'마지막 금고 · 교장실', vault:true, scene:'vlt',
+    story:'교장실 구석에 네 칸짜리 글자 자물쇠가 달린 금고가 있다. 정문 열쇠가 이 안에 있다. 문 밖 복도에서 발소리가 점점 가까워진다.',
     q:'금고의 네 글자 암호는?', word:'정사각형',
     clue:'열쇠 숫자가 작은 문에서 얻은 글자부터 차례로 읽어라.<br><span class="small dim">열쇠 숫자는 그 문을 열 때 입력한 답이다.</span>',
     hints:['글자를 얻은 순서대로 읽으면 뜻이 없습니다. 글자 아래의 열쇠 숫자를 비교하세요.',
            '열쇠 숫자를 작은 것부터 놓으면 3 → 4 → 30 → 125 입니다.'],
     explain:'<b>풀이</b> 열쇠 숫자 3(정) · 4(사) · 30(각) · 125(형) → <b>정사각형</b>. 네 변의 길이와 네 각의 크기가 모두 같은 사각형입니다.' },
 
-  { title:'도전 방 · 평행사변형 속의 한 점', bonus:true,
-    story:'탈출한 사람만 들어올 수 있는 비밀의 방이다.',
+  { title:'도전 방 · 지하 창고', bonus:true, scene:'bsm',
+    story:'정문 옆, 지하 창고로 내려가는 계단이 있다. 탈출한 사람만 내려갈 수 있다. 백열전구 아래 바닥에 평행사변형이 그려져 있다.',
     q:'△PCD의 넓이는?', unit:'', ans:{n:12},
     cards:[
-      {tag:'바닥 그림', body:'평행사변형 안의 한 점 P', fig:'rb'},
-      {tag:'기록 ①', body:'□ABCD는 평행사변형이고 넓이는 60'},
-      {tag:'기록 ②', body:'점 P는 평행사변형 내부의 한 점'},
-      {tag:'기록 ③', body:'△PAB의 넓이 = 18'},
-      {tag:'기록 ④', body:'△PBC의 넓이 = 16'}],
+      {tag:'바닥의 그림', body:'평행사변형 안의 한 점 P', fig:'rb'},
+      {tag:'벽의 낙서 ①', body:'□ABCD는 평행사변형이고 넓이는 60'},
+      {tag:'벽의 낙서 ②', body:'점 P는 평행사변형 내부의 한 점'},
+      {tag:'벽의 낙서 ③', body:'△PAB의 넓이 = 18'},
+      {tag:'벽의 낙서 ④', body:'△PBC의 넓이 = 16'}],
     hints:['△PAB와 △PCD는 밑변의 길이가 같고(AB = CD), 두 높이의 합은 평행사변형의 높이입니다.',
            '△PAB + △PCD = 평행사변형 넓이의 절반'],
     explain:'<b>풀이</b> △PAB + △PCD = ½ × 60 = 30이므로 △PCD = 30 − 18 = 12. △PBC의 넓이는 필요 없는 정보였습니다.' }
@@ -368,8 +420,145 @@ function elapsedOf(meta,now){
 let S=null;               // 저장소
 let unsubs=[];            // 현재 화면의 구독
 let ticker=null;
-function clearView(){unsubs.forEach(u=>u&&u());unsubs=[];clearInterval(ticker);ticker=null;layer.innerHTML=''}
+function clearView(){unsubs.forEach(u=>u&&u());unsubs=[];clearInterval(ticker);ticker=null;layer.innerHTML='';if(window.FX)FX.leave()}
 function modeBanner(){if(PRACTICE)return `<div class="banner row" style="justify-content:space-between"><span>테스트 모드입니다. 기록은 남지 않고, 힌트와 정답을 직접 볼 수 있습니다.</span><button class="btn" style="min-height:36px;padding:6px 12px" onclick="exitPractice()">테스트 끝내기</button></div>`;return S.local?`<div class="banner">로컬 테스트 모드입니다. 같은 브라우저의 탭끼리만 연결됩니다. 교사 탭 하나, 학생 탭 여러 개를 열어 시험해 보세요.</div>`:''}
+
+/* ============================================================
+   3-1. 폐교 분위기 — 장면 그림 · 효과음 · 화면 효과
+   그림은 모두 직접 그린 SVG, 소리는 파일 없이 브라우저에서 합성합니다.
+   ============================================================ */
+const SCENES={
+  hero:`<svg class="hero-img" viewBox="0 0 360 170" aria-hidden="true"><rect width="360" height="170" fill="#09080a"/>
+    <circle cx="296" cy="36" r="19" fill="#d8ddd0" opacity=".28"/><circle cx="296" cy="36" r="34" fill="#d8ddd0" opacity=".05"/>
+    <rect x="150" y="30" width="60" height="34" fill="#121114" stroke="#26242a" stroke-width="2"/>
+    <circle cx="180" cy="46" r="9" fill="none" stroke="#3a3833" stroke-width="2"/><path d="M180 46v-6M180 46l4 3" stroke="#3a3833" stroke-width="1.5"/>
+    <rect x="30" y="62" width="300" height="98" fill="#121114" stroke="#26242a" stroke-width="2"/>
+    <text x="180" y="79" text-anchor="middle" font-size="12" fill="#6f695e" letter-spacing="7">진 해 중 학<tspan dy="3" rotate="14"> 교</tspan></text>
+    <g fill="#0a0c10" stroke="#23222a">
+      <rect x="48" y="90" width="26" height="22"/><rect x="94" y="90" width="26" height="22"/><rect x="140" y="90" width="26" height="22"/>
+      <rect x="194" y="90" width="26" height="22"/><rect x="240" y="90" width="26" height="22"/><rect x="286" y="90" width="26" height="22"/>
+      <rect x="48" y="124" width="26" height="22"/><rect x="94" y="124" width="26" height="22"/><rect x="240" y="124" width="26" height="22"/><rect x="286" y="124" width="26" height="22"/>
+    </g>
+    <rect class="win-lit" x="194" y="90" width="26" height="22" fill="#4d6b55"/>
+    <rect x="160" y="118" width="40" height="42" fill="#050405" stroke="#23222a"/>
+    <g stroke="#1c1b1f" stroke-width="3"><path d="M0 160h360"/><path d="M20 160v-26M44 160v-26M68 160v-26M292 160v-26M316 160v-26M340 160v-26"/><path d="M14 138h66M286 138h66"/></g>
+  </svg>`,
+  cls:`<svg viewBox="0 0 360 130"><rect width="360" height="130" fill="#0c0b0d"/>
+    <rect x="40" y="16" width="200" height="74" fill="#1b271f" stroke="#3a3a33" stroke-width="3"/>
+    <path d="M92 80 L130 28 L170 80 Z M92 80 L149 52" stroke="#c9c3b3" stroke-width="1.5" fill="none" opacity=".5"/>
+    <text x="178" y="44" font-size="17" fill="#a3281d" opacity=".85" font-family="East Sea Dokdo,sans-serif">나가지 마</text>
+    <rect x="272" y="18" width="60" height="62" fill="#10151a" stroke="#2c2c2a" stroke-width="3"/><path d="M302 18v62M272 49h60" stroke="#2c2c2a" stroke-width="2"/>
+    <circle cx="314" cy="34" r="8" fill="#cfd6c8" opacity=".3"/>
+    <g fill="#050405"><rect x="30" y="102" width="60" height="8"/><rect x="36" y="110" width="4" height="20"/><rect x="80" y="110" width="4" height="20"/>
+      <rect x="130" y="100" width="60" height="8" transform="rotate(-9 160 104)"/><rect x="232" y="104" width="60" height="8"/><rect x="238" y="112" width="4" height="18"/><rect x="282" y="112" width="4" height="18"/></g>
+    <text x="42" y="11" font-size="10" fill="#6b6457">2학년 3반</text></svg>`,
+  sci:`<svg viewBox="0 0 360 130"><rect width="360" height="130" fill="#0c0b0d"/>
+    <g stroke="#2f2d29" stroke-width="4"><path d="M20 32h122M20 67h122M20 102h122"/></g>
+    <g fill="#18221d" stroke="#3b463f"><rect x="30" y="12" width="14" height="20" rx="3"/><rect x="56" y="17" width="12" height="15" rx="3"/><rect x="92" y="10" width="17" height="22" rx="3"/>
+      <rect x="40" y="47" width="14" height="20" rx="3"/><rect x="102" y="50" width="14" height="17" rx="3"/><rect x="66" y="84" width="16" height="18" rx="3"/></g>
+    <ellipse cx="100" cy="21" rx="4" ry="3" fill="#6f8a73" opacity=".6"/>
+    <path d="M190 122 L190 28 L322 122 Z" fill="none" stroke="#6b6252" stroke-width="3"/>
+    <path d="M190 28 L242 122" stroke="#a3281d" stroke-width="2" opacity=".7"/>
+    <circle cx="300" cy="38" r="14" fill="none" stroke="#3b463f" stroke-width="2"/><path d="M300 38v-9M300 38l7 4" stroke="#6b6252" stroke-width="2"/>
+    <text x="22" y="125" font-size="10" fill="#6b6457">과학실</text></svg>`,
+  lib:`<svg viewBox="0 0 360 130"><rect width="360" height="130" fill="#0c0b0d"/>
+    <path d="M122 8 L60 60 L202 60 Z" fill="none" stroke="#4b463d" stroke-width="2"/>
+    <path d="M60 60 L133 42 L202 60 M122 8 L133 42" stroke="#a3281d" stroke-width="1.5" opacity=".6"/>
+    <path d="M282 0v34" stroke="#3a3833" stroke-width="2"/><path d="M268 34h28l-6 10h-16z" fill="#2a2823"/>
+    <ellipse cx="282" cy="84" rx="48" ry="30" fill="#c9c09a" opacity=".06"/>
+    <g fill="#16141a" stroke="#2b2830"><rect x="10" y="74" width="120" height="56"/><rect x="150" y="74" width="100" height="56"/></g>
+    <g fill="#2a2330"><rect x="16" y="80" width="6" height="20"/><rect x="24" y="82" width="7" height="18"/><rect x="34" y="79" width="5" height="21"/><rect x="60" y="81" width="8" height="19"/>
+      <rect x="92" y="86" width="16" height="6" transform="rotate(-20 100 89)"/><rect x="160" y="80" width="6" height="20"/><rect x="170" y="83" width="9" height="17"/><rect x="196" y="79" width="6" height="21"/></g>
+    <text x="302" y="125" font-size="10" fill="#6b6457">도서실</text></svg>`,
+  off:`<svg viewBox="0 0 360 130"><rect width="360" height="130" fill="#0c0b0d"/>
+    <path d="M112 22 L82 110 L252 110 L282 22 Z" fill="#0f141a" stroke="#4b463d" stroke-width="4"/>
+    <circle cx="238" cy="48" r="12" fill="#d6dccc" opacity=".28"/>
+    <path d="M147 22 L117 110 M182 22 L152 110 M217 22 L187 110 M252 22 L222 110" stroke="#2f2d29" stroke-width="3"/>
+    <path d="M112 22 L152 110" stroke="#a3281d" stroke-width="2" opacity=".65"/>
+    <path d="M196 70 q6 -16 12 0 v18 h-12z" fill="#050405" opacity=".85"/>
+    <g fill="#050405"><rect x="18" y="100" width="44" height="30"/><rect x="298" y="96" width="46" height="34"/></g>
+    <text x="20" y="16" font-size="10" fill="#6b6457">교무실</text></svg>`,
+  vlt:`<svg viewBox="0 0 360 130"><rect width="360" height="130" fill="#0c0b0d"/>
+    <rect x="130" y="18" width="100" height="104" rx="6" fill="#1a1a1c" stroke="#4b463d" stroke-width="3"/>
+    <circle cx="180" cy="60" r="20" fill="none" stroke="#6b6252" stroke-width="3"/><path d="M180 60l12-8" stroke="#a3281d" stroke-width="3"/>
+    <g fill="#2a2823" stroke="#4b463d"><rect x="146" y="92" width="16" height="20"/><rect x="164" y="92" width="16" height="20"/><rect x="182" y="92" width="16" height="20"/><rect x="200" y="92" width="16" height="20"/></g>
+    <rect x="20" y="28" width="72" height="48" fill="#111" stroke="#2c2b28" stroke-width="3"/><text x="30" y="56" font-size="10" fill="#5e584d">교 육 목 표</text>
+    <rect x="276" y="60" width="64" height="70" fill="#050405"/><text x="268" y="20" font-size="10" fill="#6b6457">교장실</text></svg>`,
+  bsm:`<svg viewBox="0 0 360 130"><rect width="360" height="130" fill="#070608"/>
+    <path d="M36 130 L36 110 L76 110 L76 90 L116 90 L116 70 L156 70 L156 50 L196 50" fill="none" stroke="#3a3833" stroke-width="3"/>
+    <path d="M272 0v40" stroke="#3a3833"/><circle cx="272" cy="46" r="6" fill="#d9c98a" opacity=".6"/><ellipse cx="272" cy="102" rx="72" ry="24" fill="#d9c98a" opacity=".05"/>
+    <path d="M232 112 L222 126 L302 126 L312 112 Z" fill="none" stroke="#6b6252" stroke-width="2"/>
+    <text x="302" y="20" font-size="10" fill="#6b6457">지하 창고</text></svg>`
+};
+
+/* ---- 효과음: 모두 합성. 첫 터치 뒤에만 소리가 납니다(브라우저 규칙) ---- */
+const SND=(()=>{
+  let ctx=null, master=null, amb=null, ambNodes=[], NB=null, started=false;
+  let on=true; try{on=localStorage.getItem('horror_snd')!=='off'}catch(e){}
+  function init(){
+    if(ctx)return true;
+    try{ctx=new (window.AudioContext||window.webkitAudioContext)();master=ctx.createGain();master.gain.value=on?0.8:0;master.connect(ctx.destination);return true}
+    catch(e){return false}
+  }
+  function nbuf(){if(NB)return NB;NB=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return NB}
+  function noise(dur,f,q,g,t){const s=ctx.createBufferSource();s.buffer=nbuf();const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=f;bp.Q.value=q;
+    const gn=ctx.createGain();gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(g,t+Math.min(.05,dur/3));gn.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    s.connect(bp);bp.connect(gn);gn.connect(master);s.start(t);s.stop(t+dur+.05)}
+  function tone(f,dur,type,g,t,glide){const o=ctx.createOscillator();o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(glide)o.frequency.exponentialRampToValueAtTime(glide,t+dur);
+    const gn=ctx.createGain();gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(g,t+.02);gn.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(gn);gn.connect(master);o.start(t);o.stop(t+dur+.05)}
+  function ambient(){   // 낮게 웅웅거리는 건물 소리 + 창틈 바람
+    const t=ctx.currentTime, g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.05,t+3);g.connect(master);
+    const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=170;lp.connect(g);
+    ambNodes=[];[55,55.7,82.4].forEach(f=>{const o=ctx.createOscillator();o.type='sawtooth';o.frequency.value=f;o.connect(lp);o.start();ambNodes.push(o)});
+    const s=ctx.createBufferSource();s.buffer=nbuf();s.loop=true;const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=420;bp.Q.value=.7;
+    const wg=ctx.createGain();wg.gain.value=.22;s.connect(bp);bp.connect(wg);wg.connect(g);s.start();ambNodes.push(s);
+    const lfo=ctx.createOscillator();lfo.frequency.value=.07;const lg=ctx.createGain();lg.gain.value=260;lfo.connect(lg);lg.connect(bp.frequency);lfo.start();ambNodes.push(lfo);
+    amb=g}
+  const ok=()=>ctx&&on;
+  return {
+    get on(){return on},
+    start(){if(!init())return;if(ctx.state==='suspended')ctx.resume().catch(()=>{});if(!started){started=true;ambient()}},
+    toggle(){on=!on;try{localStorage.setItem('horror_snd',on?'on':'off')}catch(e){}if(!init())return;this.start();master.gain.setTargetAtTime(on?0.8:0,ctx.currentTime,.05)},
+    creak(){if(!ok())return;const t=ctx.currentTime,o=ctx.createOscillator();o.type='sawtooth';o.frequency.setValueAtTime(90,t);o.frequency.linearRampToValueAtTime(145,t+.5);o.frequency.linearRampToValueAtTime(68,t+1.1);
+      const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=900;bp.Q.value=8;const l=ctx.createOscillator();l.frequency.value=23;const lg=ctx.createGain();lg.gain.value=420;l.connect(lg);lg.connect(bp.frequency);
+      const g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.35,t+.1);g.gain.exponentialRampToValueAtTime(.0001,t+1.2);
+      o.connect(bp);bp.connect(g);g.connect(master);o.start(t);l.start(t);o.stop(t+1.3);l.stop(t+1.3)},
+    chime(){if(!ok())return;const t=ctx.currentTime+.9;[659.3,523.3,440,493.9].forEach((f,i)=>tone(f,1.4,'sine',.12,t+i*.28))},   // 음이 어긋난 오르골
+    sting(){if(!ok())return;const t=ctx.currentTime;[196,207.7,277.2].forEach(f=>tone(f,.9,'square',.06,t));noise(.35,1800,.8,.35,t);tone(110,1.2,'sawtooth',.1,t,55)},
+    beat(){if(!ok())return;const t=ctx.currentTime;tone(62,.18,'sine',.5,t,40);tone(56,.18,'sine',.35,t+.22,38)},
+    whisper(){if(!ok())return;const t=ctx.currentTime;for(let i=0;i<5;i++)noise(.25+Math.random()*.2,1200+Math.random()*2500,6,.05,t+i*.18)},
+    steps(){if(!ok())return;const t=ctx.currentTime;for(let i=0;i<4;i++){noise(.12,180,1.2,.4,t+i*.55);tone(70,.12,'sine',.25,t+i*.55)}},
+    escape(){if(!ok())return;const t=ctx.currentTime;if(amb)amb.gain.setTargetAtTime(0,t,.5);[261.6,329.6,392,523.3].forEach((f,i)=>tone(f,2.2,'triangle',.1,t+i*.15))},
+    stopAmb(){if(!ctx||!amb)return;amb.gain.setTargetAtTime(0,ctx.currentTime,.3);const ns=ambNodes;amb=null;ambNodes=[];started=false;
+      setTimeout(()=>ns.forEach(n=>{try{n.stop()}catch(e){}}),1200)}
+  };
+})();
+
+/* ---- 화면 효과: 붉은 번쩍임, 흔들림, 정전 깜빡임. '동작 줄이기' 설정이면 끔 ---- */
+const FX=(()=>{
+  let scareT=null, beatT=null;
+  const reduce=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function flash(){const f=$('#fx-flash');if(!f)return;f.classList.add('on');setTimeout(()=>f.classList.remove('on'),170)}
+  function shake(){if(reduce())return;const b=document.body;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),500)}
+  function blackout(){if(reduce())return;const b=document.body;b.classList.add('blackout');setTimeout(()=>b.classList.remove('blackout'),120);
+    setTimeout(()=>{b.classList.add('blackout');setTimeout(()=>b.classList.remove('blackout'),70)},230)}
+  function loop(){clearTimeout(scareT);scareT=setTimeout(()=>{const r=Math.random();
+    if(r<.4){blackout();SND.whisper()}else if(r<.75)SND.steps();else SND.whisper();loop()},25000+Math.random()*25000)}
+  return {
+    enter(){loop()},
+    leave(){clearTimeout(scareT);clearInterval(beatT);beatT=null;SND.stopAmb();document.body.classList.remove('dawn','shake','blackout')},
+    wrong(ms){flash();shake();SND.sting();clearInterval(beatT);let n=0;const k=Math.max(1,Math.floor(ms/900));
+      beatT=setInterval(()=>{SND.beat();if(++n>=k){clearInterval(beatT);beatT=null}},900)},
+    unlock(){clearInterval(beatT);beatT=null;SND.creak();SND.chime()},
+    escape(){clearTimeout(scareT);document.body.classList.add('dawn');SND.escape()}
+  };
+})();
+
+/* 필름 잡음: 작은 무늬를 한 번만 만들어 배경으로 깔고 CSS로 흔듦 (휴대폰 부담이 적음) */
+(function grain(){try{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');const im=x.createImageData(128,128);
+  for(let i=0;i<im.data.length;i+=4){const v=Math.random()*255|0;im.data[i]=im.data[i+1]=im.data[i+2]=v;im.data[i+3]=255}
+  x.putImageData(im,0,0);const g=document.getElementById('fx-grain');if(g)g.style.backgroundImage='url('+c.toDataURL()+')'}catch(e){}})();
 
 /* ============================================================
    4. 첫 화면
@@ -380,10 +569,10 @@ function viewHome(){
   if(qs.get('code'))return viewJoin(qs.get('code'));
   app.innerHTML=`${modeBanner()}
   <div class="hero">
-    <h1>기하학자의 서재</h1>
-    <p class="dim">삼각형과 사각형의 성질로 여는 네 개의 문. 한 사람씩 도전하는 개인전입니다. 가장 먼저 서재를 빠져나가는 사람은 누구일까요?</p>
+    ${SCENES.hero}<h1>진해중 폐교 탈출</h1>
+    <p class="dim">오래전 문을 닫은 옛 진해중학교 건물. 정신을 차리니 정문이 잠겨 있다. 삼각형과 사각형의 성질로 잠긴 문 네 개를 열고, 교장실 금고에서 정문 열쇠를 찾아 탈출하라. 한 사람씩 도전하는 개인전이다.</p>
     <div class="choose">
-      <button class="btn primary" id="goJoin">학생으로 입장<span style="color:#5a3d00">수업 코드를 입력합니다</span></button>
+      <button class="btn primary" id="goJoin">학생으로 입장<span style="color:#f0d2c9">수업 코드를 입력합니다</span></button>
       <button class="btn" id="goTeach">교사 관제실<span>수업을 만들거나 다시 들어갑니다</span></button>
     </div>
     <button class="btn block" id="goPr" style="margin-top:12px">테스트 모드 (교사용)<span class="small dim" style="font-weight:400;margin-left:6px">비밀번호가 필요합니다</span></button>
@@ -559,12 +748,14 @@ function viewJoin(pre){
    ============================================================ */
 function viewPlay(code,pid){
   clearView();
-  let room=null, lastStage=null, showBonus=false;
+  let room=null, lastStage=null, showBonus=false, lastWrong=null;
   const P='rooms/'+code+'/players/'+pid;
+  FX.enter(); document.addEventListener('pointerdown',()=>SND.start(),{once:true});
   S.presence(P);
   function unlockFx(stageIdx){
     const s=STAGES[stageIdx];
     layer.innerHTML=`<div class="unlock" role="status"><div class="ring">✓</div><h2>${s.bonus?'도전 방 해결!':s.vault?'금고가 열렸다':'문이 열렸다'}</h2>${s.letter?`<p class="got">글자 획득<b>${s.letter}</b></p>`:''}<p>${s.explain}</p></div>`;
+    FX.unlock();
     setTimeout(()=>{layer.innerHTML=''},s.letter||s.vault?4200:3200);
   }
   function render(){
@@ -574,7 +765,7 @@ function viewPlay(code,pid){
     const now=S.now(), stage=me.stage||0, total=Object.keys(room.players||{}).length;
     if(m.state==='lobby'){
       app.innerHTML=`${modeBanner()}<div class="hero"><div class="dim">${esc(m.name)}</div>
-        <h1 style="margin-top:6px">잠시 기다리세요</h1><p class="dim">선생님이 시작하면 모두 동시에 첫 번째 문 앞에 섭니다.</p>
+        <h1 style="margin-top:6px">잠시 기다리세요</h1><p class="dim">선생님이 신호를 주면 폐교의 불이 꺼집니다. 이어폰이 있다면 소리를 켜고 들어가세요.</p>
         <div class="sheet"><div class="in"><h3>${esc(me.name)}</h3><p class="dim small" style="margin-top:6px">지금 ${total}명이 들어와 있습니다. 문 네 개를 열어 글자를 모으고, 마지막 금고까지 가장 먼저 여는 사람이 1등입니다.</p></div></div></div>`;
       return;
     }
@@ -586,6 +777,7 @@ function viewPlay(code,pid){
       const rk=Object.entries(room.players||{}).filter(([,x])=>x.escaped!=null).sort((a,b)=>a[1].escaped-b[1].escaped).findIndex(([id])=>id===pid)+1;
       const bonusDone=stage>MAIN;
       app.innerHTML=`<div class="hero"><div class="dim">${esc(me.name)}</div><h1 style="margin-top:6px">탈출 성공</h1>
+        <p class="dim" style="margin-top:8px">정문 자물쇠가 풀리고, 새벽빛이 복도로 쏟아진다.</p>
         <p class="num" style="font-size:2rem;font-weight:700;margin-top:10px">${fmt(me.escaped)}</p>
         <p class="dim">${total}명 중 ${rk}번째로 탈출했습니다.</p>
         ${bonusDone?'<p style="margin-top:14px;color:var(--mint);font-weight:700">도전 방까지 해결했습니다.</p>':
@@ -601,9 +793,10 @@ function viewPlay(code,pid){
     <div class="topbar">
       <span><b>${esc(me.name)}</b></span>
       <span class="dots" aria-label="진행">${Array.from({length:MAIN},(_,i)=>`<i class="${i<stage?'done':i===stage?'now':''}"></i>`).join('')}</span>
-      <span class="num" id="clock">${fmt(elapsedOf(m,now))}</span>
+      <span class="row" style="gap:8px"><button class="snd" id="snd" aria-label="소리 켜기/끄기">${SND.on?'🔊':'🔇'}</button><span class="num" id="clock">${fmt(elapsedOf(m,now))}</span></span>
     </div>
     ${s.bonus?'':lettersBar(stage)}
+    ${s.scene?`<div class="scene" aria-hidden="true">${SCENES[s.scene]}</div>`:''}
     <h2 class="roomtitle">${s.title}</h2>
     <p class="story">${s.story}</p>
     <div class="cards">${s.vault?vaultCards(stage):s.cards.map(c=>`<div class="clue"><div class="tag">${c.tag}</div><div class="body">${c.body}</div>${c.fig?F[c.fig]:''}</div>`).join('')}</div>
@@ -641,11 +834,15 @@ function viewPlay(code,pid){
     const ok=$('#ok');if(ok)ok.onclick=submit;
     const an=$('#an');if(an)an.onkeydown=e=>{if(e.key==='Enter')submit()};
     const sh=$('#selfHint');if(sh)sh.onclick=()=>S.set(P+'/hints/'+cur,hintLv+1);
+    const sb=$('#snd');if(sb)sb.onclick=e=>{e.stopPropagation();SND.toggle();sb.textContent=SND.on?'🔊':'🔇'};
   }
   unsubs.push(S.on('rooms/'+code,v=>{
     room=v; if(!v){app.innerHTML='<p>수업이 사라졌습니다.</p>';return}
-    const st=(((v.players||{})[pid])||{}).stage||0;
+    const me_=((v.players||{})[pid])||{}, st=me_.stage||0, wr=me_.wrong||0;
+    if(lastWrong!==null&&wr>lastWrong)FX.wrong(PRACTICE?3000:LOCK_MS);
+    lastWrong=wr;
     if(lastStage!==null&&st>lastStage)unlockFx(lastStage);
+    if(lastStage!==null&&lastStage<MAIN&&st>=MAIN)FX.escape();
     lastStage=st; render();
   }));
   ticker=setInterval(()=>{
@@ -666,7 +863,7 @@ function lettersBar(stage){
 function vaultCards(stage){
   const tiles=STAGES.slice(0,DOORS).map((d,i)=>`<div class="tile"><b>${stage>i?d.letter:'?'}</b><span>${i+1}번째 문<br>열쇠 ${d.ans.n}</span></div>`).join('');
   return `<div class="clue"><div class="tag">모은 글자 (얻은 순서)</div><div class="tiles">${tiles}</div></div>`+
-         `<div class="clue"><div class="tag">관리인의 쪽지</div><div class="body">${STAGES[DOORS].clue}</div></div>`;
+         `<div class="clue"><div class="tag">경비 아저씨의 마지막 쪽지</div><div class="body">${STAGES[DOORS].clue}</div></div>`;
 }
 const PRACTICE_PW='7abc5c2e49190f6b9e1a9c6248dc6e482be784f62a73d05cc8d4641350553db2';   // 테스트 비밀번호의 지문 (원문은 코드에 없음)
 function viewPracticeGate(){
