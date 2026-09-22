@@ -263,7 +263,7 @@ function showStart(msg){
     <div class="sheet"><div class="in stack">
       <h3>선생님</h3><label class="f" for="su">구글 시트 주소</label><input class="t" id="su" placeholder="https://docs.google.com/spreadsheets/d/…">
       <button class="btn block" id="goT">시트 불러오기</button>
-      <p class="small dim">처음이라면 견본 시트를 복사해서 문제를 바꿔 쓰세요. 시트의 [공유]에서 일반 액세스를 <b>링크가 있는 모든 사용자 · 뷰어</b>로 바꿔야 게임이 읽을 수 있습니다.</p></div></div>`);
+      <p class="small dim">처음이라면 <a href="template.csv" download="방탈출_문제시트_견본.csv" style="color:var(--amber)">견본 시트(CSV)</a>를 내려받아 구글 시트에서 [파일 → 가져오기]로 연 뒤 문제를 바꿔 쓰세요. 시트의 [공유]에서 일반 액세스를 <b>링크가 있는 모든 사용자 · 뷰어</b>로 바꿔야 게임이 읽을 수 있습니다.</p></div></div>`);
   $l('#goS').onclick=()=>{const c=$l('#cd').value.trim();if(/^\d{4}$/.test(c))location.search='?code='+c};
   $l('#goT').onclick=()=>{const id=sheetIdFrom($l('#su').value);if(id)location.search='?sheet='+encodeURIComponent(id);else alert('시트 주소를 확인해 주세요.')};
 }
