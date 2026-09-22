@@ -284,6 +284,7 @@ function viewTeacherEntry(){
         $('#mk').disabled=true;
         let code;for(let i=0;i<20;i++){code=String(1000+Math.floor(Math.random()*9000));if(!(await S.once('rooms/'+code+'/meta')))break}
         await S.set('rooms/'+code,{meta:{name:nm,game:GAME_ID,mode:'solo',pw:await hash(pw),state:'lobby',createdAt:S.now()}});
+        if(GAME.onRoomCreated)await GAME.onRoomCreated(code,S);   // 시트판: 문제를 수업에 복사
         sessionStorage.setItem('teach_'+code,'1');
         viewDash(code);
       };
@@ -450,7 +451,7 @@ function viewPlay(code,pid){
         <p class="dim" style="margin-top:8px">정문 자물쇠가 풀리고, 새벽빛이 복도로 쏟아진다.</p>
         <p class="num" style="font-size:2rem;font-weight:700;margin-top:10px">${fmt(me.escaped)}</p>
         <p class="dim">${total}명 중 ${rk}번째로 탈출했습니다.</p>
-        ${bonusDone?'<p style="margin-top:14px;color:var(--mint);font-weight:700">도전 방까지 해결했습니다.</p>':
+        ${bonusDone?'<p style="margin-top:14px;color:var(--mint);font-weight:700">도전 방까지 해결했습니다.</p>':STAGES.length<=MAIN?'':
           `<button class="btn primary" style="margin-top:20px" id="bn">도전 방 들어가기</button>`}</div>`;
       const bn=$('#bn');if(bn)bn.onclick=()=>{showBonus=true;render()};
       return;
