@@ -1,0 +1,221 @@
+/* 방탈출 공통 스타일 — 기본 + 폐교 테마 */
+:root{
+  --paper:#173A6B; --paper-deep:#10294D; --paper-hi:#1F4A82;
+  --chalk:#EEF3FA; --chalk-dim:#A9BCD6; --line:rgba(238,243,250,.22);
+  --amber:#F3B741; --mint:#72D8B4; --coral:#F07B6B;
+  --r-sm:6px; --r-md:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'IBM Plex Sans KR',-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  color:var(--chalk); background:var(--paper-deep);
+  background-image:
+    linear-gradient(var(--grid,rgba(255,255,255,.05)) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid,rgba(255,255,255,.05)) 1px,transparent 1px),
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:80px 80px,80px 80px,16px 16px,16px 16px;
+  line-height:1.55; -webkit-font-smoothing:antialiased;
+  padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+}
+#app{max-width:880px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.9rem,6vw,2.8rem);font-weight:700;letter-spacing:-.03em;line-height:1.15}
+h2{font-size:1.35rem;font-weight:700;letter-spacing:-.02em}
+h3{font-size:1.05rem;font-weight:700}
+p{max-width:62ch}
+.dim{color:var(--chalk-dim)}
+.small{font-size:.86rem}
+.num{font-variant-numeric:tabular-nums}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+/* ---- 도면 틀: 굵은 외곽선 + 안쪽 가는 선 (청사진 도면의 표제란 느낌) ---- */
+.sheet{border:2px solid var(--chalk);border-radius:var(--r-sm);padding:4px;margin:16px 0}
+.sheet>.in{border:1px solid var(--line);border-radius:3px;padding:18px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--chalk);
+  background:transparent;border-radius:var(--r-sm);padding:12px 18px;font-weight:700;min-height:48px}
+.btn:hover{background:rgba(238,243,250,.08)}
+.btn.primary{background:var(--amber);border-color:var(--amber);color:#2A1B00}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.danger{border-color:var(--coral);color:var(--coral)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.block{width:100%}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.stack>*+*{margin-top:12px}
+
+label.f{display:block;font-size:.88rem;color:var(--chalk-dim);margin-bottom:6px}
+input.t,select.t{width:100%;background:rgba(0,0,0,.18);border:1.5px solid var(--line);border-radius:var(--r-sm);
+  padding:12px 14px;font-size:1.05rem;min-height:48px}
+input.t:focus{border-color:var(--chalk)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;min-width:52px;border:1.5px solid var(--line);background:transparent;border-radius:var(--r-sm);padding:10px;font-weight:700}
+.seg button[aria-pressed=true]{border-color:var(--amber);background:rgba(243,183,65,.14);color:var(--amber)}
+
+.banner{border:1.5px dashed var(--amber);color:var(--amber);border-radius:var(--r-sm);padding:10px 14px;font-size:.88rem;margin-bottom:14px}
+.err{color:var(--coral);font-size:.9rem;min-height:1.4em}
+
+/* ---- 첫 화면 ---- */
+.hero{padding:28px 4px 8px}
+.hero .dim{margin-top:10px}
+.choose{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
+.choose .btn{min-height:88px;flex-direction:column;font-size:1.1rem}
+.choose .btn span{font-weight:400;font-size:.84rem;color:var(--chalk-dim)}
+@media (max-width:520px){.choose{grid-template-columns:1fr}}
+
+/* ---- 학생 플레이 ---- */
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 2px 12px;border-bottom:1px solid var(--line)}
+.dots{display:flex;gap:6px}
+.dots i{width:12px;height:12px;border-radius:50%;border:2px solid var(--chalk-dim)}
+.dots i.done{background:var(--mint);border-color:var(--mint)}
+.dots i.now{border-color:var(--amber);background:rgba(243,183,65,.3)}
+.story{margin:16px 0 4px;color:var(--chalk-dim)}
+.roomtitle{margin-top:14px}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:14px 0}
+/* 단서 카드 = 찢어낸 도면 조각. 이 게임에서 유일하게 힘을 준 요소 */
+.clue{position:relative;background:var(--paper-hi);border-radius:4px;padding:16px 16px 18px;
+  border:1.5px solid var(--chalk-dim);
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 10px),94% 100%,86% calc(100% - 7px),76% 100%,64% calc(100% - 8px),52% 100%,40% calc(100% - 6px),28% 100%,16% calc(100% - 8px),6% 100%,0 calc(100% - 9px))}
+.clue .tag{font-size:.78rem;color:var(--amber);font-weight:600;margin-bottom:6px}
+.clue .body{font-size:1.12rem;font-weight:600;line-height:1.5}
+.clue svg{display:block;width:100%;max-width:300px;height:auto;margin:8px auto 2px}
+.fig text{fill:var(--chalk);font-family:inherit;font-weight:700}
+.fig .ln{stroke:var(--chalk);stroke-width:2.2;fill:none}
+.fig .hl{stroke:var(--amber);stroke-width:3.4;fill:none}
+.fig .aux{stroke:var(--chalk-dim);stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+.fig .dot{fill:var(--chalk)}
+
+.mates{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 2px}
+.mates span{border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:.84rem;color:var(--chalk-dim)}
+.mates span.me{border-color:var(--amber);color:var(--amber)}
+
+.lock{border:2px solid var(--chalk);border-radius:var(--r-sm);padding:4px;margin-top:18px}
+.lock>.in{border:1px solid var(--line);border-radius:3px;padding:16px}
+.lock .q{font-size:1.15rem;font-weight:700;margin-bottom:12px}
+.lock .ans{display:flex;gap:10px}
+.lock .ans input{flex:1;font-size:1.3rem;text-align:center}
+.hint{border-left:4px solid var(--mint);background:rgba(114,216,180,.1);padding:10px 12px;margin-top:12px;border-radius:0 var(--r-sm) var(--r-sm) 0;font-size:.95rem}
+.lockmsg{color:var(--coral);font-weight:700;margin-top:10px}
+
+/* 문이 열리는 순간 — 게임 전체에서 단 하나의 연출 */
+.unlock{position:fixed;inset:0;background:rgba(16,41,77,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:24px;z-index:50}
+.unlock .ring{width:120px;height:120px;border-radius:50%;border:6px solid var(--mint);display:flex;align-items:center;justify-content:center;
+  font-size:2.6rem;color:var(--mint);animation:pop .5s ease-out}
+.unlock h2{margin-top:18px}
+.unlock p{margin-top:10px;color:var(--chalk-dim)}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.unlock .ring{animation:none}}
+
+.overlay{position:fixed;inset:0;background:rgba(16,41,77,.9);display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;z-index:40}
+
+.explain{border:1px dashed var(--line);border-radius:var(--r-sm);padding:10px 12px;margin-top:14px;font-size:.92rem;color:var(--chalk-dim)}
+.explain b{color:var(--chalk)}
+
+/* ---- 교사 관제실 ---- */
+.dash-head{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}
+.code{font-size:3.2rem;font-weight:700;letter-spacing:.12em;line-height:1}
+.qr{background:#fff;padding:8px;border-radius:var(--r-sm);width:132px;height:132px}
+.qr img,.qr canvas{width:116px!important;height:116px!important}
+.groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:14px}
+.gcard{border:1.5px solid var(--line);border-radius:var(--r-sm);padding:14px}
+.gcard.escaped{border-color:var(--mint)}
+.gcard .gt{display:flex;justify-content:space-between;align-items:baseline}
+.gcard .where{font-size:1.2rem;font-weight:700;margin:6px 0}
+.gcard .who{font-size:.84rem;color:var(--chalk-dim);min-height:1.3em}
+.gcard .meta{font-size:.84rem;color:var(--chalk-dim);margin-top:6px}
+.gcard .hb{display:flex;gap:6px;margin-top:10px}
+.gcard .hb button{flex:1;border:1.5px solid var(--mint);color:var(--mint);background:transparent;border-radius:var(--r-sm);padding:8px 4px;font-size:.84rem;font-weight:700}
+.gcard .hb button:disabled{opacity:.35;cursor:default}
+.rank{list-style:none;counter-reset:r}
+.rank li{counter-increment:r;display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
+.rank li::before{content:counter(r) "위";color:var(--amber);font-weight:700;width:3em}
+.rank li span:first-child{flex:1}
+@media (max-width:560px){.dash-head{grid-template-columns:1fr}.code{font-size:2.6rem}}
+/* ---- 글자 모으기 ---- */
+.lbar{display:flex;align-items:center;gap:6px;margin-top:10px}
+.lbar i{width:32px;height:32px;border:1.5px dashed var(--chalk-dim);border-radius:4px;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;font-size:1.05rem}
+.lbar i.got{border:1.5px solid var(--amber);color:var(--amber);background:rgba(243,183,65,.12)}
+.lbar span{margin-left:6px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.tile{border:1.5px solid var(--amber);border-radius:6px;padding:10px 4px;text-align:center;background:rgba(0,0,0,.12)}
+.tile b{display:block;font-size:2.2rem;color:var(--amber);line-height:1.1}
+.tile span{font-size:.74rem;color:var(--chalk-dim);line-height:1.3}
+.unlock .got{font-size:1.1rem;color:var(--chalk);margin-top:14px;display:flex;align-items:center;gap:10px}
+.unlock .got b{font-size:2.4rem;color:var(--amber);border:2px solid var(--amber);border-radius:6px;padding:0 14px;line-height:1.3}
+/* ---- 개인전 관제실 ---- */
+.dist{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:12px}
+.dcol{border:1.5px solid var(--line);border-radius:var(--r-sm);padding:10px 8px;text-align:center}
+.dcol.done{border-color:var(--mint)}
+.dn{font-size:1.8rem;font-weight:700;line-height:1.1}.dn span{font-size:.9rem;font-weight:400;color:var(--chalk-dim);margin-left:2px}
+.dl{font-size:.84rem;color:var(--chalk-dim);margin-top:2px}
+.dh{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+.dh button,.ph button{border:1.5px solid var(--mint);color:var(--mint);background:transparent;border-radius:var(--r-sm);font-weight:700;font-size:.8rem;padding:6px 4px}
+.dh button:disabled,.ph button:disabled{opacity:.3;cursor:default}
+.tw{overflow-x:auto;margin-top:8px}
+.ptable{width:100%;border-collapse:collapse;font-size:.92rem}
+.ptable th{text-align:left;font-weight:600;color:var(--chalk-dim);font-size:.8rem;padding:6px 8px;border-bottom:1.5px solid var(--line)}
+.ptable td{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.ptable tr.esc td:first-child{color:var(--mint);font-weight:700}
+.dots.sm i{width:10px;height:10px}
+.ph{display:inline-flex;gap:4px}.ph button{width:30px}
+@media (max-width:560px){.dist{grid-template-columns:repeat(3,1fr)}}
+
+/* ===== 폐교 공포 테마 ===== */
+:root{--paper:#141214;--paper-deep:#0A090B;--paper-hi:#1C1A1E;--chalk:#E4DFD2;--chalk-dim:#8E887C;--line:rgba(228,223,210,.16);
+  --amber:#C29A55;--mint:#7FA38A;--coral:#C0402F;--blood:#8C1F17}
+body{background:#0A090B;background-image:radial-gradient(ellipse at 50% -10%,rgba(150,180,150,.10),transparent 55%),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 2px,transparent 2px 120px),linear-gradient(#0e0d10,#070608);background-size:auto}
+#app{position:relative;z-index:1;transition:opacity .15s}
+#fx-vig{position:fixed;inset:0;pointer-events:none;z-index:30;background:radial-gradient(ellipse at center,transparent 58%,rgba(0,0,0,.5) 100%)}
+#fx-grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:31;opacity:.07;animation:grain .5s steps(4) infinite}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}100%{transform:translate(1%,3%)}}
+#fx-flash{position:fixed;inset:0;pointer-events:none;z-index:60;background:#5e0c08;opacity:0;transition:opacity .09s}
+#fx-flash.on{opacity:.6}
+body.blackout #app{opacity:.05;transition:none}
+body.shake #app{animation:shake .45s}
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(5px)}30%,50%,70%{transform:translateX(-9px)}40%,60%{transform:translateX(9px)}}
+.hero h1{font-family:'East Sea Dokdo','IBM Plex Sans KR',sans-serif;font-weight:400;font-size:clamp(3.2rem,13vw,4.8rem);line-height:1;letter-spacing:0;
+  color:#ddd6c6;text-shadow:0 0 14px rgba(192,64,47,.45);animation:flick 7s infinite}
+@keyframes flick{0%,18%,22%,60%,63%,100%{opacity:1}20%,61.5%{opacity:.35}}
+.hero-img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:6px;margin-bottom:18px}
+.roomtitle{font-family:'East Sea Dokdo','IBM Plex Sans KR',sans-serif;font-weight:400;font-size:2.3rem;letter-spacing:0;line-height:1.05;color:#e0d8c8}
+.scene{margin:10px 0 2px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#080709}
+.scene svg{display:block;width:100%;height:auto}
+.win-lit{animation:winlit 5s infinite}
+@keyframes winlit{0%,40%,44%,100%{opacity:.55}42%{opacity:.08}}
+/* 단서 = 누렇게 바랜 종이 */
+.clue{background:#D6CCB2;background-image:radial-gradient(circle at 18% 22%,rgba(120,90,40,.18),transparent 30%),radial-gradient(circle at 82% 70%,rgba(90,60,30,.16),transparent 35%),linear-gradient(#DCD3BA,#CFC4A8);
+  border-color:#8a7f66;color:#221E19}
+.clue .tag{color:#8C1F17;font-family:'Nanum Pen Script','IBM Plex Sans KR',sans-serif;font-size:1.35rem;font-weight:400;letter-spacing:0}
+.clue .body{color:#221E19}
+.clue .dim,.clue .small.dim{color:#5c5445}
+.fig text{fill:#221E19}.fig .ln{stroke:#2a2520}.fig .hl{stroke:#9E2A20}.fig .aux{stroke:#6b6252}.fig .dot{fill:#2a2520}
+.btn.primary{background:#8C1F17;border-color:#8C1F17;color:#F1E9DA}
+.btn{border-color:#8e887c}
+.seg button[aria-pressed=true]{border-color:#C0402F;background:rgba(192,64,47,.16);color:#e8a197}
+.sheet,.lock{border-color:#6b655a}
+.dots i.done{background:#7FA38A;border-color:#7FA38A}
+.dots i.now{border-color:#C0402F;background:rgba(192,64,47,.35)}
+.lbar i.got{color:#d04a37;border-color:#8C1F17;background:rgba(140,31,23,.18);font-family:'East Sea Dokdo',sans-serif;font-size:1.6rem;font-weight:400}
+.tile{border-color:#8C1F17;background:rgba(40,8,6,.25)}
+.tile b{color:#C0402F;font-family:'East Sea Dokdo',sans-serif;font-weight:400;font-size:3rem}
+.tile span{color:#5c5445}
+.unlock{background:rgba(6,5,7,.95)}
+.unlock .ring{border-color:#7FA38A;color:#7FA38A}
+.unlock .got b{font-family:'East Sea Dokdo',sans-serif;font-weight:400;color:#C0402F;border-color:#8C1F17;font-size:3.4rem}
+.hint{border-left-color:#7FA38A;background:rgba(127,163,138,.10)}
+.banner{border-color:#C29A55;color:#C29A55}
+.snd{background:transparent;border:1px solid var(--line);border-radius:6px;padding:3px 9px;font-size:1rem;line-height:1.2;color:var(--chalk)}
+body.dawn{background:#3a2e36;background-image:linear-gradient(#1d1824,#5a4048 55%,#b58a62)}
+body.dawn #fx-vig{opacity:.4}
+@media (prefers-reduced-motion:reduce){.hero h1,.win-lit,#fx-grain{animation:none}body.shake #app{animation:none}}
+
+/* ---- 오답 분석 ---- */
+.trap{display:inline-block;border:1px solid #C0402F;color:#e8a197;border-radius:999px;padding:1px 9px;margin:2px;font-size:.8rem;white-space:nowrap}
+.trap.etc{border-color:var(--line);color:var(--chalk-dim)}
+.rtable td{white-space:normal;vertical-align:top}
+.rtable td.num{white-space:nowrap}
