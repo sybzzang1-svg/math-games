@@ -161,6 +161,17 @@ input.t:focus{border-color:var(--chalk)}
 .rank li::before{content:counter(r) "위";color:var(--amber);font-weight:700;width:3em}
 .rank li span:first-child{flex:1}
 @media (max-width:560px){.dash-head{grid-template-columns:1fr}.code{font-size:2.6rem}}
+
+/* ---- 글자 모으기 · 오답 분석 ---- */
+.lbar{display:flex;align-items:center;gap:6px;margin:10px 0 2px}
+.lbar i{font-style:normal;width:34px;height:34px;border:1.5px dashed var(--chalk-dim);border-radius:6px;display:grid;place-items:center;font-weight:700;font-size:1.05rem}
+.lbar i.got{border-style:solid;border-color:var(--amber);color:var(--amber);background:rgba(243,183,65,.12)}
+.lbar .small{margin-left:6px}
+.trap{display:inline-block;border:1px solid var(--coral);color:#ffc2b9;border-radius:999px;padding:1px 9px;margin:2px;font-size:.8rem;white-space:nowrap}
+.trap.etc{border-color:var(--line);color:var(--chalk-dim)}
+.rtable{width:100%;border-collapse:collapse;margin-top:10px;font-size:.9rem}
+.rtable th,.rtable td{text-align:left;padding:8px 6px;border-top:1px solid var(--line);vertical-align:top}
+.rtable th{color:var(--chalk-dim);font-weight:600;font-size:.8rem}
 </style>
 </head>
 <body>
@@ -203,80 +214,124 @@ const F = {
     <text x="80" y="60">A</text><text x="6" y="184">B</text><text x="242" y="184">C</text><text x="82" y="186">H</text></svg>`
 };
 
+/* ---- 무작위 범위 설계: 금고 암호 "닮음조건" ----
+   3번 문(닮) 4~10  <  4번 문(음) 11~20  <  1번 문(조) 21~48  <  2번 문(건) 50~85
+   숫자는 조마다 다르고, 같은 조 친구들은 같은 숫자를 봅니다 (단서를 나눠 들고 함께 풀기 때문) */
+function rng(seed){let a=(seed>>>0)||1;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const pick=(r,arr)=>arr[Math.floor(r()*arr.length)];
+const randInt=(r,lo,hi)=>lo+Math.floor(r()*(hi-lo+1));
+const fx=n=>String(Math.round(n*100)/100);
 const STAGES = [
-  { title:'첫 번째 문 · 탑의 설계도',
+  { title:'첫 번째 문 · 탑의 설계도', letter:'조', unit:'m',
     story:'박물관 지하에 갇혔다. 문에는 탑의 설계도와 실제 탑을 잰 기록이 흩어져 있다.',
-    q:'실제 탑에서 변 FE의 길이는 몇 m일까?', unit:'m', ans:{n:15},
-    cards:[
-      {tag:'벽에 새겨진 글', body:'설계도의 삼각형과 실제 탑의 삼각형은 닮은 도형이다.<br><b style="font-size:1.3rem">△ABC ∽ △DFE</b>'},
-      {tag:'설계도 조각', body:'설계도의 변 AB', fig:'r1small'},
-      {tag:'설계도 조각', body:'설계도의 변 BC', fig:'r1small2'},
-      {tag:'현장 측량 기록', body:'실제 탑의 변 DF', fig:'r1big'},
-      {tag:'찢어진 수첩', body:'1 m = 100 cm<br>길이를 비교할 때는 단위부터 맞출 것.'}],
-    hints:['기호 △ABC ∽ △DFE는 순서대로 짝을 짓습니다. A↔D, B↔F, C↔E',
-           'AB와 짝인 변은 DF입니다. 4 cm : 1000 cm의 비를 BC에 똑같이 적용해 보세요.'],
-    explain:'<b>풀이</b> 10 m = 1000 cm이므로 닮음비는 4 : 1000 = 1 : 250. BC와 짝인 FE = 6 × 250 = 1500 cm = 15 m' },
+    q:'실제 탑에서 변 FE의 길이는 몇 m일까?',
+    trapNames:{cm:'단위를 m로 바꾸지 않음(cm로 답함)', flip:'짝이 되는 변을 거꾸로 맞춤'},
+    make(r){ let AB,DF,BC,FE;
+      do{ [AB,DF]=pick(r,[[4,10],[2,5],[5,10],[3,6]]); BC=randInt(r,5,24); FE=BC*DF/AB; }while(FE<21||FE>48||Math.round(FE*2)!==FE*2||BC===AB);
+      const sc=DF*100/AB;
+      return { ans:{n:FE}, traps:[{id:'cm',v:FE*100},{id:'flip',v:Math.round(AB*DF/BC*100)/100}],
+        cards:[
+          {tag:'벽에 새겨진 글', body:'설계도의 삼각형과 실제 탑의 삼각형은 닮은 도형이다.<br><b style="font-size:1.3rem">△ABC ∽ △DFE</b>'},
+          {tag:'설계도 조각', body:`설계도의 변 AB = ${AB} cm`, fig:'r1small'},
+          {tag:'설계도 조각', body:`설계도의 변 BC = ${BC} cm`, fig:'r1small2'},
+          {tag:'현장 측량 기록', body:`실제 탑의 변 DF = ${DF} m`, fig:'r1big'},
+          {tag:'찢어진 수첩', body:'1 m = 100 cm<br>길이를 비교할 때는 단위부터 맞출 것.'}],
+        hints:['기호 △ABC ∽ △DFE는 순서대로 짝을 짓습니다. A↔D, B↔F, C↔E',
+               `AB와 짝인 변은 DF입니다. ${DF} m = ${DF*100} cm이므로 ${AB} cm : ${DF*100} cm의 비를 BC에 똑같이 적용해 보세요.`],
+        explain:`<b>풀이</b> ${DF} m = ${DF*100} cm이므로 닮음비는 ${AB} : ${DF*100} = 1 : ${fx(sc)}. BC와 짝인 FE = ${BC} × ${fx(sc)} = ${fx(FE*100)} cm = ${fx(FE)} m` }; } },
 
-  { title:'두 번째 문 · 깨진 조각상',
+  { title:'두 번째 문 · 깨진 조각상', letter:'건', unit:'°',
     story:'작은 조각상과 큰 조각상이 마주 보고 있다. 큰 조각상의 각 하나가 떨어져 나갔다.',
-    q:'∠D의 크기는 몇 도일까?', unit:'°', ans:{n:50},
-    cards:[
-      {tag:'받침대의 글', body:'두 조각상의 삼각형은 닮은 도형이다.<br><b style="font-size:1.3rem">△ABC ∽ △EDF</b>'},
-      {tag:'작은 조각상', body:'∠A = 55°'},
-      {tag:'큰 조각상', body:'∠F = 75°'},
-      {tag:'낡은 안내판', body:'삼각형의 세 내각의 크기의 합은 180°'},
-      {tag:'관리인의 메모', body:'닮은 도형에서 서로 짝이 되는 각의 크기는 같다.'}],
-    hints:['△ABC ∽ △EDF에서 짝을 지으면 A↔E, B↔D, C↔F 입니다.',
-           '∠D는 ∠B와 크기가 같습니다. ∠C = ∠F를 이용해 ∠B부터 구하세요.'],
-    explain:'<b>풀이</b> ∠C = ∠F = 75°, ∠B = 180° − 55° − 75° = 50°. ∠D는 ∠B와 짝이므로 50°' },
+    q:'∠D의 크기는 몇 도일까?',
+    trapNames:{a:'짝을 잘못 지음 (∠A와 같다고 봄)', f:'짝을 잘못 지음 (∠F와 같다고 봄)'},
+    make(r){ let A,Fd,D;
+      do{ A=randInt(r,8,14)*5; Fd=randInt(r,6,16)*5; D=180-A-Fd; }while(D<50||D>85||D===A||D===Fd||A===Fd);
+      return { ans:{n:D}, traps:[{id:'a',v:A},{id:'f',v:Fd}],
+        cards:[
+          {tag:'받침대의 글', body:'두 조각상의 삼각형은 닮은 도형이다.<br><b style="font-size:1.3rem">△ABC ∽ △EDF</b>'},
+          {tag:'작은 조각상', body:`∠A = ${A}°`},
+          {tag:'큰 조각상', body:`∠F = ${Fd}°`},
+          {tag:'낡은 안내판', body:'삼각형의 세 내각의 크기의 합은 180°'},
+          {tag:'관리인의 메모', body:'닮은 도형에서 서로 짝이 되는 각의 크기는 같다.'}],
+        hints:['△ABC ∽ △EDF에서 짝을 지으면 A↔E, B↔D, C↔F 입니다.',
+               '∠D는 ∠B와 크기가 같습니다. ∠C = ∠F를 이용해 ∠B부터 구하세요.'],
+        explain:`<b>풀이</b> ∠C = ∠F = ${Fd}°, ∠B = 180° − ${A}° − ${Fd}° = ${D}°. ∠D는 ∠B와 짝이므로 ${D}°` }; } },
 
-  { title:'세 번째 문 · 겹쳐진 삼각형',
+  { title:'세 번째 문 · 겹쳐진 삼각형', letter:'닮', unit:'', cond:true,
     story:'문 위에 큰 삼각형이 그려져 있고, 그 안에 작은 삼각형이 비스듬히 겹쳐 있다.',
-    q:'작은 삼각형 ADE와 큰 삼각형 ABC는 닮은 도형이다. 닮음 조건과 선분 DE의 길이는?', unit:'', ans:{cond:'SAS', n:10}, cond:true,
-    cards:[
-      {tag:'문의 그림', body:'D는 변 AB 위, E는 변 AC 위의 점이다.<br><span class="small dim">그림은 실제 길이의 비와 다를 수 있다.</span>', fig:'r3'},
-      {tag:'측량 기록 ①', body:'AB = 12<br>AD = 6'},
-      {tag:'측량 기록 ②', body:'AC = 9<br>AE = 8'},
-      {tag:'측량 기록 ③', body:'BC = 15'},
-      {tag:'오래된 교본', body:'닮음 조건<br>SSS 세 쌍의 변의 비가 같다<br>SAS 두 쌍의 변의 비가 같고 그 끼인각이 같다<br>AA 두 쌍의 각이 같다'}],
-    hints:['∠A는 △ADE와 △ACB가 함께 쓰고 있는 각입니다.',
-           'AD와 짝이 되는 변은 AB가 아니라 AC일 수 있습니다. AD : AC와 AE : AB를 비교해 보세요.'],
-    explain:'<b>풀이</b> AD : AC = 6 : 9 = 2 : 3, AE : AB = 8 : 12 = 2 : 3, ∠A는 공통 → SAS 닮음. DE = 15 × 2/3 = 10' },
+    q:'작은 삼각형 ADE와 큰 삼각형 ABC는 닮은 도형이다. 닮음 조건과 선분 DE의 길이는?',
+    trapNames:{wrongpair:'AD와 AB를 짝으로 봄 (대응 잘못)'},
+    make(r){ let p,q,a,b,c;
+      for(let t=0;t<500;t++){ [p,q]=pick(r,[[1,2],[2,3],[3,4]]); a=randInt(r,2,7); b=randInt(r,2,7); c=randInt(r,2,8);
+        if(a===b)continue; if(!(p*a<q*b&&p*b<q*a))continue; if(!(a+b>c&&a+c>b&&b+c>a))continue;
+        const DE=p*c; if(DE<4||DE>10)continue; if(q*a>30||q*b>30||q*c>30)continue; break; }
+      const AB=q*a, AC=q*b, BC=q*c, AD=p*b, AE=p*a, DE=p*c;
+      return { ans:{cond:'SAS',n:DE}, traps:[{id:'wrongpair',v:Math.round(BC*AD/AB*100)/100}],
+        cards:[
+          {tag:'문의 그림', body:'D는 변 AB 위, E는 변 AC 위의 점이다.<br><span class="small dim">그림은 실제 길이의 비와 다를 수 있다.</span>', fig:'r3'},
+          {tag:'측량 기록 ①', body:`AB = ${AB}<br>AD = ${AD}`},
+          {tag:'측량 기록 ②', body:`AC = ${AC}<br>AE = ${AE}`},
+          {tag:'측량 기록 ③', body:`BC = ${BC}`},
+          {tag:'오래된 교본', body:'닮음 조건<br>SSS 세 쌍의 변의 비가 같다<br>SAS 두 쌍의 변의 비가 같고 그 끼인각이 같다<br>AA 두 쌍의 각이 같다'}],
+        hints:['∠A는 △ADE와 △ACB가 함께 쓰고 있는 각입니다.',
+               'AD와 짝이 되는 변은 AB가 아니라 AC일 수 있습니다. AD : AC와 AE : AB를 비교해 보세요.'],
+        explain:`<b>풀이</b> AD : AC = ${AD} : ${AC} = ${p} : ${q}, AE : AB = ${AE} : ${AB} = ${p} : ${q}, ∠A는 공통 → SAS 닮음. DE = ${BC} × ${p}/${q} = ${DE}` }; } },
 
-  { title:'네 번째 문 · 거울에 비친 나무',
+  { title:'네 번째 문 · 거울에 비친 나무', letter:'음', unit:'m',
     story:'마지막 문 밖에 큰 나무가 있다. 줄자는 나무 꼭대기에 닿지 않는다. 바닥에 거울이 하나 놓여 있다.',
-    q:'나무의 높이는 몇 m일까?', unit:'m', ans:{n:12},
-    cards:[
-      {tag:'현장 스케치', body:'사람이 거울 속에서 나무 꼭대기를 보고 있다.', fig:'r4'},
-      {tag:'측량 기록 ①', body:'바닥에서 사람의 눈까지 높이 1.6 m'},
-      {tag:'측량 기록 ②', body:'사람의 발에서 거울까지 2 m'},
-      {tag:'측량 기록 ③', body:'거울에서 나무 밑동까지 15 m'},
-      {tag:'과학실 메모', body:'빛은 거울에 들어온 각과 같은 각으로 반사된다.<br>사람과 나무는 모두 바닥에 수직으로 서 있다.'}],
-    hints:['사람 쪽 직각삼각형과 나무 쪽 직각삼각형은 두 쌍의 각이 같습니다 (AA 닮음).',
-           '(눈높이) : (사람~거울) = (나무 높이) : (거울~나무)'],
-    explain:'<b>풀이</b> 반사각이 같고 두 삼각형 모두 직각이 있으므로 AA 닮음. 1.6 : 2 = h : 15 → h = 12 m' },
+    q:'나무의 높이는 몇 m일까?',
+    trapNames:{flip:'비를 거꾸로 세움'},
+    make(r){ const [e,d1,d2]=pick(r,[[1.6,2,15],[1.6,2,20],[1.6,2,25],[1.5,2,16],[1.5,2,20],[1.5,2,24],[1.5,3,24],[1.5,3,30],[1.5,3,36],[1.4,2,20]]);
+      const h=Math.round(e*d2/d1*100)/100;
+      return { ans:{n:h}, traps:[{id:'flip',v:Math.round(d1*d2/e*100)/100}],
+        cards:[
+          {tag:'현장 스케치', body:'사람이 거울 속에서 나무 꼭대기를 보고 있다.', fig:'r4'},
+          {tag:'측량 기록 ①', body:`바닥에서 사람의 눈까지 높이 ${e} m`},
+          {tag:'측량 기록 ②', body:`사람의 발에서 거울까지 ${d1} m`},
+          {tag:'측량 기록 ③', body:`거울에서 나무 밑동까지 ${d2} m`},
+          {tag:'과학실 메모', body:'빛은 거울에 들어온 각과 같은 각으로 반사된다.<br>사람과 나무는 모두 바닥에 수직으로 서 있다.'}],
+        hints:['사람 쪽 직각삼각형과 나무 쪽 직각삼각형은 두 쌍의 각이 같습니다 (AA 닮음).',
+               '(눈높이) : (사람~거울) = (나무 높이) : (거울~나무)'],
+        explain:`<b>풀이</b> 반사각이 같고 두 삼각형 모두 직각이 있으므로 AA 닮음. ${e} : ${d1} = h : ${d2} → h = ${h} m` }; } },
 
-  { title:'도전 방 · 직각삼각형 속 수선', bonus:true,
+  { title:'마지막 금고 · 관장실', vault:true, word:'닮음조건',
+    story:'관장실 금고에 네 칸짜리 글자 자물쇠가 달려 있다. 조원들이 얻은 글자 카드가 흩어져 있다.',
+    q:'금고의 네 글자 암호는?', traps:[{id:'order',v:'조건닮음'}], trapNames:{order:'얻은 순서대로 읽음'},
+    clue:'열쇠 숫자가 작은 문에서 얻은 글자부터 차례로 읽어라.<br><span class="small dim">열쇠 숫자는 그 문을 열 때 입력한 답이다. 글자 카드는 조원들이 나눠 가지고 있다.</span>',
+    hints:['글자를 얻은 순서대로 읽으면 뜻이 없습니다. 조원들이 가진 글자 카드의 열쇠 숫자를 모두 모아 비교하세요.',
+           '열쇠 숫자를 작은 것부터: 3번째 문 → 4번째 문 → 1번째 문 → 2번째 문'],
+    explain:'<b>풀이</b> 열쇠 숫자가 작은 순서: 3번째 문(닮) · 4번째 문(음) · 1번째 문(조) · 2번째 문(건) → <b>닮음조건</b>' },
+
+  { title:'도전 방 · 직각삼각형 속 수선', bonus:true, unit:'',
     story:'탈출한 조만 들어올 수 있는 비밀의 방이다.',
-    q:'선분 AH의 길이는?', unit:'', ans:{n:6},
-    cards:[
-      {tag:'바닥 그림', body:'직각삼각형 ABC와 꼭짓점 A에서 내린 수선 AH', fig:'rb'},
-      {tag:'기록 ①', body:'∠BAC = 90°'},
-      {tag:'기록 ②', body:'AH ⊥ BC'},
-      {tag:'기록 ③', body:'BH = 4'},
-      {tag:'기록 ④', body:'HC = 9'}],
-    hints:['△ABH와 △CAH는 닮음입니다 (AA).',
-           'BH : AH = AH : HC 이므로 AH × AH = BH × HC'],
-    explain:'<b>풀이</b> △ABH ∽ △CAH (AA). BH : AH = AH : HC → AH² = 4 × 9 = 36 → AH = 6' }
+    q:'선분 AH의 길이는?',
+    make(r){ const [BH,HC]=pick(r,[[4,9],[2,8],[3,12],[4,16],[9,16],[4,25],[8,18],[5,20],[1,9],[2,18]]); const AH=Math.sqrt(BH*HC);
+      return { ans:{n:AH},
+        cards:[
+          {tag:'바닥 그림', body:'직각삼각형 ABC와 꼭짓점 A에서 내린 수선 AH', fig:'rb'},
+          {tag:'기록 ①', body:'∠BAC = 90°'},
+          {tag:'기록 ②', body:'AH ⊥ BC'},
+          {tag:'기록 ③', body:`BH = ${BH}`},
+          {tag:'기록 ④', body:`HC = ${HC}`}],
+        hints:['△ABH와 △CAH는 닮음입니다 (AA).', 'BH : AH = AH : HC 이므로 AH × AH = BH × HC'],
+        explain:`<b>풀이</b> △ABH ∽ △CAH (AA). BH : AH = AH : HC → AH² = ${BH} × ${HC} = ${BH*HC} → AH = ${AH}` }; } }
 ];
-const MAIN = 4;           // 탈출에 필요한 방 개수
+const GAME_ID = 'dameum';
+const DOORS = 4;          // 글자를 주는 문
+const MAIN = 5;           // 탈출까지: 문 4개 + 마지막 금고
 const LOCK_MS = 20000;    // 오답 시 잠금 시간
+const _stageCache={};
+function stageOf(i,seed){const k=i+':'+(seed||0);if(_stageCache[k])return _stageCache[k];const b=STAGES[i];let o=b;
+  if(b.make)o=Object.assign({},b,b.make(rng((((seed||0)*2654435761)^(i*40503+17))>>>0)));
+  else if(b.vault){const ds=STAGES.slice(0,DOORS).map((_,j)=>stageOf(j,seed));
+    o=Object.assign({},b,{cards:ds.map((d,j)=>({tag:`${j+1}번째 문에서 얻은 글자`,body:`<b style="font-size:2rem">${d.letter}</b><br>열쇠 숫자 ${fx(d.ans.n)}`})).concat([{tag:'관장의 쪽지',body:b.clue}])})}
+  return _stageCache[k]=o}
 
 /* ============================================================
    2. 저장소 — Firebase 또는 로컬(같은 브라우저 탭끼리)
    ============================================================ */
-function makeLocalStore(){
-  const KEY='escape_local_db';
+function makeLocalStore(key){
+  const KEY=key||'escape_local_db';
   const read=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}};
   const write=(o)=>{localStorage.setItem(KEY,JSON.stringify(o));fire()};
   const get=(o,p)=>p.split('/').filter(Boolean).reduce((a,k)=>a==null?undefined:a[k],o);
@@ -334,7 +389,7 @@ let S=null;               // 저장소
 let unsubs=[];            // 현재 화면의 구독
 let ticker=null;
 function clearView(){unsubs.forEach(u=>u&&u());unsubs=[];clearInterval(ticker);ticker=null;layer.innerHTML=''}
-function modeBanner(){return S.local?`<div class="banner">로컬 테스트 모드입니다. 같은 브라우저의 탭끼리만 연결됩니다. 교사 탭 하나, 학생 탭 여러 개를 열어 시험해 보세요.</div>`:''}
+function modeBanner(){if(PRACTICE)return `<div class="banner" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>테스트 모드 · 혼자서 모든 단서를 봅니다 · 잠금 3초 · 기록이 남지 않습니다</span><button class="btn" id="exitPr" style="min-height:34px;padding:4px 10px">나가기</button></div>`;return S.local?`<div class="banner">로컬 테스트 모드입니다. 같은 브라우저의 탭끼리만 연결됩니다. 교사 탭 하나, 학생 탭 여러 개를 열어 시험해 보세요.</div>`:''}
 
 /* ============================================================
    4. 첫 화면
@@ -346,14 +401,16 @@ function viewHome(){
   app.innerHTML=`${modeBanner()}
   <div class="hero">
     <h1>설계도의 비밀</h1>
-    <p class="dim">닮음으로 풀어 가는 협동 방탈출. 조원마다 서로 다른 단서가 주어집니다. 혼자서는 열 수 없는 문을 함께 여세요.</p>
+    <p class="dim">닮음으로 풀어 가는 협동 방탈출. 조원마다 서로 다른 단서가 주어집니다. 혼자서는 열 수 없는 문을 함께 열고, 마지막 금고의 암호를 찾으세요. 조마다 숫자가 다릅니다.</p>
     <div class="choose">
       <button class="btn primary" id="goJoin">학생으로 입장<span style="color:#5a3d00">수업 코드를 입력합니다</span></button>
       <button class="btn" id="goTeach">교사 관제실<span>수업을 만들거나 다시 들어갑니다</span></button>
     </div>
+    <button class="btn block" id="goPr" style="margin-top:12px">테스트 모드 (교사용)<span class="small dim" style="font-weight:400;margin-left:6px">비밀번호가 필요합니다</span></button>
   </div>`;
   $('#goJoin').onclick=()=>viewJoin('');
   $('#goTeach').onclick=viewTeacherEntry;
+  $('#goPr').onclick=viewPracticeGate;
 }
 
 /* ============================================================
@@ -391,8 +448,8 @@ function viewTeacherEntry(){
         if(pw.length<4)return $('#er').textContent='비밀번호는 4자 이상으로 정해 주세요.';
         $('#mk').disabled=true;
         let code;for(let i=0;i<20;i++){code=String(1000+Math.floor(Math.random()*9000));if(!(await S.once('rooms/'+code+'/meta')))break}
-        const g={};for(let i=1;i<=groups;i++)g[i]={stage:0,wrong:0};
-        await S.set('rooms/'+code,{meta:{name:nm,groups,pw:await hash(pw),state:'lobby',createdAt:S.now()},groups:g});
+        const g={};for(let i=1;i<=groups;i++)g[i]={stage:0,wrong:0,seed:Math.floor(Math.random()*1e9)};
+        await S.set('rooms/'+code,{meta:{name:nm,game:GAME_ID,groups,pw:await hash(pw),state:'lobby',createdAt:S.now()},groups:g});
         sessionStorage.setItem('teach_'+code,'1');
         viewDash(code);
       };
@@ -400,7 +457,7 @@ function viewTeacherEntry(){
       $('#re').onclick=async()=>{
         const cd=$('#cd').value.trim(), pw=$('#pw2').value;
         const meta=await S.once('rooms/'+cd+'/meta');
-        if(!meta)return $('#er').textContent='그런 수업 코드가 없습니다. 숫자 4자리를 다시 확인하세요.';
+        if(!meta||(meta.game||'dameum')!==GAME_ID)return $('#er').textContent='이 게임에서 만든 수업 코드가 아닙니다. 숫자 4자리를 다시 확인하세요.';
         if(meta.pw!==await hash(pw))return $('#er').textContent='비밀번호가 맞지 않습니다.';
         sessionStorage.setItem('teach_'+cd,'1');viewDash(cd);
       };
@@ -420,7 +477,7 @@ function viewDash(code){
   const where=g=>{
     if(g.escaped!=null&&(g.stage||0)>MAIN)return '도전 방까지 완료';
     if(g.escaped!=null)return (g.stage||0)>=MAIN?'탈출 · 도전 방 진행 중':'탈출';
-    return ((g.stage||0)+1)+'번째 문';
+    return (g.stage||0)>=DOORS?'마지막 금고':((g.stage||0)+1)+'번째 문';
   };
   function render(){
     if(!room)return;
@@ -462,7 +519,9 @@ function viewDash(code){
           <button data-g="${n}" data-l="1" ${sent>=1?'disabled':''}>힌트 1 보내기</button>
           <button data-g="${n}" data-l="2" ${sent>=2||sent<1?'disabled':''}>힌트 2 보내기</button></div>`:''}
       </div>`}).join('')}</div>
-    ${esc_.length?`<div class="sheet"><div class="in"><h3>탈출 순위</h3><ol class="rank" style="margin-top:8px">${esc_.map(([n,g])=>`<li><span>${n}조</span><span class="num">${fmt(g.escaped)}</span></li>`).join('')}</ol></div></div>`:''}`;
+    ${esc_.length?`<div class="sheet"><div class="in"><h3>탈출 순위</h3><ol class="rank" style="margin-top:8px">${esc_.map(([n,g])=>`<li><span>${n}조</span><span class="num">${fmt(g.escaped)}</span></li>`).join('')}</ol></div></div>`:''}
+    ${m.state!=='lobby'?reportHtml(room):''}`;
+    const cv=$('#csv');if(cv)cv.onclick=()=>downloadCsv(room,code);
     const qr=$('#qr');if(window.QRCode&&qr){new QRCode(qr,{text:joinUrl,width:116,height:116,correctLevel:QRCode.CorrectLevel.M})}
     const st=$('#start');if(st)st.onclick=()=>S.update('rooms/'+code+'/meta',{state:'running',startedAt:S.now(),pausedTotal:0});
     const pa=$('#pause');if(pa)pa.onclick=()=>S.update('rooms/'+code+'/meta',{state:'paused',pausedAt:S.now()});
@@ -498,6 +557,7 @@ function viewJoin(pre){
     const cd=$('#cd').value.trim();
     if(cd.length!==4){meta=null;$('#gs').innerHTML='<span class="dim small">수업 코드를 먼저 입력하세요.</span>';return}
     meta=await S.once('rooms/'+cd+'/meta');
+    if(meta&&(meta.game||'dameum')!==GAME_ID)meta=null;
     if(!meta){$('#gs').innerHTML='<span class="err">그런 수업이 없습니다. 코드를 다시 확인하세요.</span>';return}
     $('#gs').innerHTML=Array.from({length:meta.groups},(_,i)=>`<button data-n="${i+1}" aria-pressed="${group===i+1}">${i+1}조</button>`).join('');
     app.querySelectorAll('#gs [data-n]').forEach(b=>b.onclick=()=>{group=+b.dataset.n;app.querySelectorAll('#gs [data-n]').forEach(x=>x.setAttribute('aria-pressed',x===b))});
@@ -526,12 +586,12 @@ function viewPlay(code,pid){
   function myCards(stage,players,me){
     const mates=Object.entries(players).filter(([,p])=>p.group===me.group&&p.online!==false).sort((a,b)=>a[1].joinedAt-b[1].joinedAt);
     const n=mates.length||1, idx=Math.max(0,mates.findIndex(([id])=>id===pid));
-    return {mates, idx, cards:STAGES[stage].cards.map((c,i)=>({...c,i})).filter(c=>c.i%n===idx)};
+    return {mates, idx, cards:stageOf(stage,((room.groups||{})[me.group]||{}).seed||0).cards.map((c,i)=>({...c,i})).filter(c=>c.i%n===idx)};
   }
   function unlockFx(stageIdx){
-    const s=STAGES[stageIdx];
-    layer.innerHTML=`<div class="unlock" role="status"><div class="ring">✓</div><h2>${s.bonus?'도전 방 해결!':'문이 열렸다'}</h2><p>${s.explain}</p></div>`;
-    setTimeout(()=>{layer.innerHTML=''},3200);
+    const me=((room&&room.players)||{})[pid]||{}, s=stageOf(stageIdx,(((room&&room.groups)||{})[me.group]||{}).seed||0);
+    layer.innerHTML=`<div class="unlock" role="status"><div class="ring">✓</div><h2>${s.bonus?'도전 방 해결!':s.vault?'금고가 열렸다':'문이 열렸다'}</h2>${s.letter?`<p style="margin:8px 0;font-size:1.1rem">글자 획득 <b style="font-size:2rem;color:var(--amber);margin-left:6px">${s.letter}</b></p>`:''}<p>${s.explain}</p></div>`;
+    setTimeout(()=>{layer.innerHTML=''},s.letter||s.vault?4200:3200);
   }
   function render(){
     if(!room)return;
@@ -563,16 +623,18 @@ function viewPlay(code,pid){
       const bn=$('#bn');if(bn)bn.onclick=()=>{showBonus=true;render()};
       return;
     }
-    const cur=Math.min(stage,STAGES.length-1), s=STAGES[cur];
+    const cur=Math.min(stage,STAGES.length-1), s=stageOf(cur,g.seed||0);
+    if(location.protocol==='file:')window.__cur=s;   // 내 컴퓨터에서 점검할 때만
     const {mates,cards}=myCards(cur,room.players||{},me);
     const locked=g.lockUntil&&g.lockUntil>now, hintLv=(g.hints||{})[cur]||0;
-    const prev=cur>0&&!s.bonus?STAGES[cur-1]:null;
+    const prev=cur>0&&!s.bonus?stageOf(cur-1,g.seed||0):null;
     app.innerHTML=`${modeBanner()}
     <div class="topbar">
       <span><b>${me.group}조</b> <span class="dim">· ${esc(me.name)}</span></span>
       <span class="dots" aria-label="진행">${Array.from({length:MAIN},(_,i)=>`<i class="${i<stage?'done':i===stage?'now':''}"></i>`).join('')}</span>
       <span class="num" id="clock">${fmt(elapsedOf(m,now))}</span>
     </div>
+    ${s.bonus?'':`<div class="lbar" aria-label="모은 글자">${STAGES.slice(0,DOORS).map((d,i)=>`<i class="${stage>i?'got':''}">${stage>i?d.letter:''}</i>`).join('')}<span class="small dim">우리 조가 모은 글자</span></div>`}
     <h2 class="roomtitle">${s.title}</h2>
     <p class="story">${s.story}</p>
     <div class="mates">${mates.map(([id,p])=>`<span class="${id===pid?'me':''}">${esc(p.name)}</span>`).join('')}</div>
@@ -581,11 +643,13 @@ function viewPlay(code,pid){
     <div class="lock"><div class="in">
       <div class="q">${s.q}</div>
       ${s.cond?`<label class="f">닮음 조건</label><div class="seg" id="cond" style="margin-bottom:12px">${['SSS','SAS','AA'].map(x=>`<button data-c="${x}" aria-pressed="false">${x}</button>`).join('')}</div><label class="f" for="an">선분 DE의 길이</label>`:''}
-      <div class="ans"><input class="t num" id="an" inputmode="decimal" placeholder="숫자${s.unit?' ('+s.unit+')':''}" ${locked||m.state!=='running'?'disabled':''}>
+      <div class="ans"><input class="t ${s.vault?'':'num'}" id="an" ${s.vault?'maxlength="8" autocomplete="off" placeholder="네 글자"':`inputmode="decimal" placeholder="숫자${s.unit?' ('+s.unit+')':''}"`} ${locked||m.state!=='running'?'disabled':''}>
       <button class="btn primary" id="ok" ${locked||m.state!=='running'?'disabled':''}>열기</button></div>
       <div class="lockmsg" id="lm">${locked?'틀렸습니다. <span class="num" id="lt"></span>초 뒤에 다시 시도할 수 있어요.':''}</div>
       ${hintLv>=1?`<div class="hint"><b>힌트 1</b> ${s.hints[0]}</div>`:''}
       ${hintLv>=2?`<div class="hint"><b>힌트 2</b> ${s.hints[1]}</div>`:''}
+      ${PRACTICE?`<div class="row" style="margin-top:12px;gap:8px"><button class="btn" id="selfHint" ${hintLv>=2?'disabled':''}>힌트 ${Math.min(hintLv+1,2)} 보기</button></div>
+        <details style="margin-top:10px"><summary class="small dim" style="cursor:pointer">정답 확인 (테스트 모드)</summary><div class="hint" style="margin-top:8px">${s.vault?s.word:(s.cond?s.ans.cond+' · ':'')+fx(s.ans.n)+(s.unit||'')}</div></details>`:''}
     </div></div>
     ${prev?`<div class="explain">앞 문 ${prev.explain}</div>`:''}`;
     if(m.state==='paused')layer.innerHTML=`<div class="overlay"><div><h2>잠시 멈춤</h2><p class="dim" style="margin-top:8px">선생님 설명을 들어 주세요.</p></div></div>`;
@@ -593,22 +657,28 @@ function viewPlay(code,pid){
     let cond=null;
     app.querySelectorAll('#cond [data-c]').forEach(b=>b.onclick=()=>{cond=b.dataset.c;app.querySelectorAll('#cond [data-c]').forEach(x=>x.setAttribute('aria-pressed',x===b))});
     const submit=async()=>{
-      const v=parseNum($('#an').value);
-      if(isNaN(v)){$('#lm').textContent='숫자를 입력하세요.';return}
+      const raw=$('#an').value, v=parseNum(raw), nv=raw.replace(/\s/g,'');
+      if(s.vault){if(!nv){$('#lm').textContent='글자를 입력하세요.';return}}
+      else if(isNaN(v)){$('#lm').textContent='숫자를 입력하세요.';return}
       if(s.cond&&!cond){$('#lm').textContent='닮음 조건을 먼저 고르세요.';return}
-      const right=Math.abs(v-s.ans.n)<1e-9&&(!s.cond||cond===s.ans.cond);
+      const right=s.vault?nv===s.word:(Math.abs(v-s.ans.n)<1e-9&&(!s.cond||cond===s.ans.cond));
       const t=S.now(), el=elapsedOf(room.meta,t);
+      let tk='';   // 어떤 함정에 걸렸는지
+      if(!right){if(s.cond&&cond!==s.ans.cond&&Math.abs(v-s.ans.n)<1e-9)tk='cond';
+        else{const hit=(s.traps||[]).find(tp=>s.vault?nv===tp.v:Math.abs(v-tp.v)<1e-9);if(hit)tk=hit.id}}
       await S.tx('rooms/'+code+'/groups/'+me.group,c=>{
         c=c||{stage:0,wrong:0};
         if((c.stage||0)!==cur)return undefined;          // 다른 조원이 먼저 풀었음
         if(c.lockUntil&&c.lockUntil>t)return undefined;
         if(right){c.stage=cur+1;c.solved=c.solved||{};c.solved[cur]=el;if(cur===MAIN-1)c.escaped=el}
-        else{c.wrong=(c.wrong||0)+1;c.lockUntil=t+LOCK_MS}
+        else{c.wrong=(c.wrong||0)+1;c.lockUntil=t+(PRACTICE?3000:LOCK_MS);const w=Array.isArray(c.wlog)?c.wlog:(c.wlog?Object.values(c.wlog):[]);if(w.length<80)w.push({s:cur,v:String(raw).slice(0,20),k:tk,t:el,who:me.name});c.wlog=w}
         return c;
       });
     };
     const ok=$('#ok');if(ok)ok.onclick=submit;
     const an=$('#an');if(an)an.onkeydown=e=>{if(e.key==='Enter')submit()};
+    const sh=$('#selfHint');if(sh)sh.onclick=()=>S.set('rooms/'+code+'/groups/'+me.group+'/hints/'+cur,hintLv+1);
+    const xp=$('#exitPr');if(xp)xp.onclick=exitPractice;
   }
   unsubs.push(S.on('rooms/'+code,v=>{
     room=v; if(!v){app.innerHTML='<p>수업이 사라졌습니다.</p>';return}
@@ -625,6 +695,60 @@ function viewPlay(code,pid){
     if(g&&g.lockUntil){const left=Math.ceil((g.lockUntil-S.now())/1000);if(lt&&left>0)lt.textContent=left;else if(left<=0&&$('#ok')&&$('#ok').disabled&&room.meta.state==='running')render()}
   },300);
 }
+
+/* ============================================================
+   8-2. 오답 분석 · 결과 내려받기 (조 단위)
+   ============================================================ */
+const wlogOf=g=>Array.isArray(g.wlog)?g.wlog:(g.wlog?Object.values(g.wlog):[]);
+function trapName(i,k){if(k==='cond')return '닮음 조건 선택 오류';if(!k||k==='etc')return '그 밖의 오답';return ((STAGES[i]||{}).trapNames||{})[k]||k}
+function reportHtml(room){
+  const per=STAGES.map(()=>({n:0,gs:new Set(),tr:{}}));
+  Object.entries(room.groups||{}).forEach(([n,g])=>wlogOf(g).forEach(e=>{const o=per[e.s];if(!o)return;o.n++;o.gs.add(n);const k=e.k||'etc';o.tr[k]=(o.tr[k]||0)+1}));
+  const rows=per.map((o,i)=>!o.n?'':`<tr><td>${esc(STAGES[i].title)}</td><td class="num" style="white-space:nowrap">${o.n}회 · ${o.gs.size}개 조</td><td>${Object.entries(o.tr).sort((a,b)=>b[1]-a[1]).map(([k,c])=>`<span class="trap${k==='etc'?' etc':''}">${esc(trapName(i,k))} ${c}</span>`).join(' ')}</td></tr>`).join('');
+  return `<div class="sheet"><div class="in"><div class="row" style="justify-content:space-between"><h3>오답 분석</h3><button class="btn" id="csv" style="min-height:38px;padding:6px 12px">결과 내려받기 (엑셀·구글 시트)</button></div>
+    <p class="dim small" style="margin-top:4px">조마다 숫자가 달라도, 어떤 실수를 했는지는 같은 이름으로 모입니다.</p>
+    ${rows?`<div style="overflow-x:auto"><table class="rtable"><thead><tr><th>문</th><th>오답</th><th>걸린 함정</th></tr></thead><tbody>${rows}</tbody></table></div>`:'<p class="dim" style="margin-top:8px">아직 오답이 없습니다.</p>'}</div></div>`;
+}
+function downloadCsv(room,code){
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const head=['조','조원','도착한 곳','탈출 시간','도전 방','총 오답'].concat(STAGES.map((s,i)=>(i+1)+'. '+s.title.split('·')[0].trim()+' 오답'),['걸린 함정']);
+  const lines=[head.map(q).join(',')];
+  const ps=Object.values(room.players||{});
+  Array.from({length:room.meta.groups},(_,i)=>i+1).forEach(n=>{
+    const g=(room.groups||{})[n]||{}, w=wlogOf(g), st=g.stage||0;
+    const where=st>MAIN?'도전 방 완료':st>=MAIN?'탈출':st>=DOORS?'마지막 금고':(st+1)+'번째 문';
+    lines.push([n+'조',ps.filter(p=>p.group===n).map(p=>p.name).join(' '),where,g.escaped!=null?fmt(g.escaped):'',st>MAIN?'O':'',g.wrong||0].concat(STAGES.map((_,i)=>w.filter(e=>e.s===i).length),[w.filter(e=>e.k).map(e=>(e.s+1)+'번 '+trapName(e.s,e.k)+(e.who?'('+e.who+')':'')).join(' / ')]).map(q).join(','));
+  });
+  const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(room.meta.name||'수업')+'_'+code+'_결과.csv';
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800);
+}
+
+/* ============================================================
+   8-3. 테스트 모드 (교사용, 비밀번호 필요, 기록 안 남음)
+   ============================================================ */
+const PRACTICE_PW='7abc5c2e49190f6b9e1a9c6248dc6e482be784f62a73d05cc8d4641350553db2';   // 비밀번호의 지문 (원문은 코드에 없음)
+let PRACTICE=false, S_MAIN=null;
+function viewPracticeGate(){
+  clearView();
+  app.innerHTML=`<div class="row" style="justify-content:space-between"><h2>테스트 모드</h2><button class="btn" id="back">처음으로</button></div>
+  <div class="sheet"><div class="in stack"><p class="dim small">혼자서 모든 단서를 보며 문제를 미리 풀어 봅니다. 잠금 3초, 힌트·정답을 직접 볼 수 있고 기록은 남지 않습니다.</p>
+    <div><label class="f" for="tp">비밀번호</label><input class="t" id="tp" type="password"></div><div class="err" id="er"></div>
+    <button class="btn primary block" id="go">시작</button></div></div>`;
+  $('#back').onclick=viewHome;
+  const go=async()=>{if(await hash($('#tp').value)!==PRACTICE_PW)return $('#er').textContent='비밀번호가 맞지 않습니다.';startPractice()};
+  $('#go').onclick=go;$('#tp').onkeydown=e=>{if(e.key==='Enter')go()};
+}
+async function startPractice(){
+  clearView();
+  S_MAIN=S; PRACTICE=true;
+  const key='escape_practice_'+GAME_ID; localStorage.removeItem(key); S=makeLocalStore(key);
+  const code='0000', pid='tester';
+  await S.set('rooms/'+code,{meta:{name:'테스트 모드',game:GAME_ID,groups:1,state:'running',startedAt:S.now(),pausedTotal:0},
+    groups:{1:{stage:0,wrong:0,seed:Math.floor(Math.random()*1e9)}},players:{[pid]:{name:'테스트',group:1,joinedAt:S.now(),online:true}}});
+  viewPlay(code,pid);
+}
+function exitPractice(){clearView();localStorage.removeItem('escape_practice_'+GAME_ID);S=S_MAIN;PRACTICE=false;viewHome()}
 
 /* ============================================================
    9. 시작
