@@ -72,6 +72,16 @@ async function makeFirebaseStore(cfg){
    ============================================================ */
 const $=(s,r=document)=>r.querySelector(s);
 const app=$('#app'), layer=$('#layer');
+/* 화면을 다시 그릴 때 입력 중이던 글자와 커서를 되살립니다.
+   (휴대폰에서 화면이 새로 그려지면 키보드가 내려가고 치던 숫자가 사라지는 것을 막습니다.) */
+(function keepInput(el){
+  const d=Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');
+  Object.defineProperty(el,'innerHTML',{configurable:true,
+    get(){return d.get.call(this)},
+    set(v){const a=document.activeElement, keep=(a&&a.id==='an'&&this.contains(a))?{v:a.value,s:a.selectionStart,e:a.selectionEnd}:null;
+      d.set.call(this,v);
+      if(keep){const n=this.querySelector('#an');if(n&&!n.disabled){n.value=keep.v;try{n.focus({preventScroll:true});n.setSelectionRange(keep.s,keep.e)}catch(x){}}}}});
+})(app);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=ms=>{ms=Math.max(0,ms|0);const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
 async function hash(s){
@@ -175,7 +185,7 @@ const SND=(()=>{
     const gn=ctx.createGain();gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(g,t+.02);gn.gain.exponentialRampToValueAtTime(.0001,t+dur);
     o.connect(gn);gn.connect(master);o.start(t);o.stop(t+dur+.05)}
   function ambient(){   // 낮게 웅웅거리는 건물 소리 + 창틈 바람
-    const t=ctx.currentTime, g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.05,t+3);g.connect(master);
+    const t=ctx.currentTime, g=ctx.createGain(); amb=g;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.05,t+3);g.connect(master);
     const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=170;lp.connect(g);
     ambNodes=[];[55,55.7,82.4].forEach(f=>{const o=ctx.createOscillator();o.type='sawtooth';o.frequency.value=f;o.connect(lp);o.start();ambNodes.push(o)});
     const s=ctx.createBufferSource();s.buffer=nbuf();s.loop=true;const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=420;bp.Q.value=.7;
@@ -185,7 +195,12 @@ const SND=(()=>{
   const ok=()=>ctx&&on;
   return {
     get on(){return on},
-    start(){if(!init())return;if(ctx.state==='suspended')ctx.resume().catch(()=>{});if(!started){started=true;ambient()}},
+    start(){if(!init())return;if(ctx.state!=='running')ctx.resume().catch(()=>{});if(!started&&on){started=true;ambient()}},
+    get live(){return !!(ctx&&ctx.state==='running'&&on)},
+    /* 화면을 껐다 켜거나 다른 앱에 다녀오면 오디오가 멈춘 채로 남습니다. 만질 때마다 되살립니다. */
+    watch(){if(this._w)return;this._w=true;const kick=()=>{if(on)this.start()};
+      ['pointerdown','touchend','click','keydown'].forEach(ev=>document.addEventListener(ev,kick,{passive:true}));
+      document.addEventListener('visibilitychange',()=>{if(!document.hidden)kick()});},
     toggle(){on=!on;try{localStorage.setItem('horror_snd',on?'on':'off')}catch(e){}if(!init())return;this.start();master.gain.setTargetAtTime(on?0.8:0,ctx.currentTime,.05)},
     creak(){if(!ok())return;const t=ctx.currentTime,o=ctx.createOscillator();o.type='sawtooth';o.frequency.setValueAtTime(90,t);o.frequency.linearRampToValueAtTime(145,t+.5);o.frequency.linearRampToValueAtTime(68,t+1.1);
       const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=900;bp.Q.value=8;const l=ctx.createOscillator();l.frequency.value=23;const lg=ctx.createGain();lg.gain.value=420;l.connect(lg);lg.connect(bp.frequency);
@@ -418,10 +433,11 @@ function viewJoin(pre){
    ============================================================ */
 function viewPlay(code,pid){
   clearView();
+  let lastKey=null;   // 같은 반 다른 학생의 변화로 입력칸이 새로 그려지지 않도록
   let room=null, lastStage=null, showBonus=false, lastWrong=null;
   const P='rooms/'+code+'/players/'+pid;
   const mySeed=()=>((((room&&room.players)||{})[pid])||{}).seed||0;
-  FX.enter(); document.addEventListener('pointerdown',()=>SND.start(),{once:true});
+  FX.enter(); SND.watch(); SND.start();
   S.presence(P);
   function unlockFx(stageIdx){
     const s=stageOf(stageIdx,mySeed());
@@ -434,6 +450,7 @@ function viewPlay(code,pid){
     const m=room.meta, me=(room.players||{})[pid];
     if(!me){app.innerHTML='<p>입장 정보가 없습니다.</p>';return}
     const now=S.now(), stage=me.stage||0, total=Object.keys(room.players||{}).length;
+    if(m.state!=='running'||stage>=MAIN)lastKey=null;   // 대기·탈출 화면은 언제나 새로 그림
     if(m.state==='lobby'){
       app.innerHTML=`${modeBanner()}<div class="hero"><div class="dim">${esc(m.name)}</div>
         <h1 style="margin-top:6px">잠시 기다리세요</h1><p class="dim">선생님이 신호를 주면 폐교의 불이 꺼집니다. 이어폰이 있다면 소리를 켜고 들어가세요.</p>
@@ -456,6 +473,10 @@ function viewPlay(code,pid){
       const bn=$('#bn');if(bn)bn.onclick=()=>{showBonus=true;render()};
       return;
     }
+    /* 다른 학생 기록이 바뀌어도 내 화면 내용이 같으면 다시 그리지 않습니다. */
+    const key=JSON.stringify([m.state,stage,showBonus,(me.lockUntil||0)>now,me.hints||0,me.seed||0,me.name]);
+    if(key===lastKey&&app.querySelector('#an'))return;
+    lastKey=key;
     const cur=Math.min(stage,STAGES.length-1), s=stageOf(cur,me.seed||0);
     if(location.protocol==='file:')window.__cur=s;   // 내 컴퓨터에서 점검할 때만
     const locked=me.lockUntil&&me.lockUntil>now;
@@ -465,7 +486,7 @@ function viewPlay(code,pid){
     <div class="topbar">
       <span><b>${esc(me.name)}</b></span>
       <span class="dots" aria-label="진행">${Array.from({length:MAIN},(_,i)=>`<i class="${i<stage?'done':i===stage?'now':''}"></i>`).join('')}</span>
-      <span class="row" style="gap:8px"><button class="snd" id="snd" aria-label="소리 켜기/끄기">${SND.on?'🔊':'🔇'}</button><span class="num" id="clock">${fmt(elapsedOf(m,now))}</span></span>
+      <span class="row" style="gap:8px"><button class="snd" id="snd" aria-label="소리 켜기/끄기" title="소리가 안 들리면 눌러 보세요. 아이폰은 옆면 무음 스위치도 풀어야 합니다.">${SND.live?'🔊':'🔇'}</button><span class="num" id="clock">${fmt(elapsedOf(m,now))}</span></span>
     </div>
     ${s.bonus?'':lettersBar(stage)}
     ${s.scene?`<div class="scene" aria-hidden="true">${SCENES[s.scene]}</div>`:''}
@@ -510,7 +531,8 @@ function viewPlay(code,pid){
     const ok=$('#ok');if(ok)ok.onclick=submit;
     const an=$('#an');if(an)an.onkeydown=e=>{if(e.key==='Enter')submit()};
     const sh=$('#selfHint');if(sh)sh.onclick=()=>S.set(P+'/hints/'+cur,hintLv+1);
-    const sb=$('#snd');if(sb)sb.onclick=e=>{e.stopPropagation();SND.toggle();sb.textContent=SND.on?'🔊':'🔇'};
+    const sb=$('#snd');if(sb){sb.onclick=e=>{e.stopPropagation();SND.toggle();sb.textContent=SND.live?'🔊':'🔇'};
+      setTimeout(()=>{const b=$('#snd');if(b)b.textContent=SND.live?'🔊':'🔇'},1200);}
   }
   unsubs.push(S.on('rooms/'+code,v=>{
     room=v; if(!v){app.innerHTML='<p>수업이 사라졌습니다.</p>';return}
