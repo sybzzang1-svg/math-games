@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;600;700&family=East+Sea+Dokdo&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../engine/escape.css?v=2">
+<link rel="stylesheet" href="../engine/escape.css?v=4">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
@@ -20,7 +20,7 @@
    교사: ?sheet=시트ID   학생: ?code=수업코드 (문제는 Firebase의 그 수업에서 받음)
    ============================================================= */
 const DB_URL='https://math-game-a024b-default-rtdb.asia-southeast1.firebasedatabase.app';
-const ENGINE_SRC='../engine/escape.js?v=3';
+const ENGINE_SRC='../engine/escape.js?v=4';
 const $l=s=>document.querySelector(s);
 const escH=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -139,7 +139,7 @@ function buildGame(rows){
   const GAME={id:'sheet', title:findSet(set,'제목')||'시트로 만든 방탈출', subtitle:findSet(set,'부제'),
     intro:escH(findSet(set,'소개')||'잠긴 문 네 개를 열고, 마지막 금고에서 정문 열쇠를 찾아 탈출하라. 한 사람씩 도전하는 개인전이다.'),
     classLabel:findSet(set,'교실')||'2학년 3반', sign:findSet(set,'간판','학교')||'진 해 중 학', graffiti:findSet(set,'낙서')||'나가지 마',
-    roomExample:findSet(set,'수업이름예시')||'2학년 3반', lockMs:Math.max(3,Math.min(120,parseFloat(String(findSet(set,'잠금')).replace(/[^\d.]/g,''))||20))*1000,
+    roomExample:findSet(set,'수업이름예시')||'2학년 3반', lockMs:Math.max(3,Math.min(120,parseFloat(String(findSet(set,'잠금')).replace(/[^\d.]/g,''))||10))*1000,
     kid:yes(findSet(set,'아이용'))};
   GAME.title=escH(GAME.title);GAME.subtitle=escH(GAME.subtitle);GAME.classLabel=escH(GAME.classLabel);GAME.sign=escH(GAME.sign);GAME.graffiti=escH(GAME.graffiti);GAME.roomExample=escH(GAME.roomExample);
   const F={}, STAGES=[];
