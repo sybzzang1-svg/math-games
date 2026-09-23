@@ -319,7 +319,7 @@ const STAGES = [
 const GAME_ID = 'dameum';
 const DOORS = 4;          // 글자를 주는 문
 const MAIN = 5;           // 탈출까지: 문 4개 + 마지막 금고
-const LOCK_MS = 20000;    // 오답 시 잠금 시간
+const LOCK_MS = 10000;    // 오답 시 잠금 시간
 const _stageCache={};
 function stageOf(i,seed){const k=i+':'+(seed||0);if(_stageCache[k])return _stageCache[k];const b=STAGES[i];let o=b;
   if(b.make)o=Object.assign({},b,b.make(rng((((seed||0)*2654435761)^(i*40503+17))>>>0)));
@@ -373,6 +373,16 @@ async function makeFirebaseStore(cfg){
    ============================================================ */
 const $=(s,r=document)=>r.querySelector(s);
 const app=$('#app'), layer=$('#layer');
+/* 화면을 다시 그릴 때 입력 중이던 글자와 커서를 되살립니다.
+   (휴대폰에서 화면이 새로 그려지면 키보드가 내려가고 치던 숫자가 사라지는 것을 막습니다.) */
+(function keepInput(el){
+  const d=Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');
+  Object.defineProperty(el,'innerHTML',{configurable:true,
+    get(){return d.get.call(this)},
+    set(v){const a=document.activeElement, keep=(a&&a.id==='an'&&this.contains(a))?{v:a.value,s:a.selectionStart,e:a.selectionEnd}:null;
+      d.set.call(this,v);
+      if(keep){const n=this.querySelector('#an');if(n&&!n.disabled){n.value=keep.v;try{n.focus({preventScroll:true});n.setSelectionRange(keep.s,keep.e)}catch(x){}}}}});
+})(app);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=ms=>{ms=Math.max(0,ms|0);const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
 async function hash(s){
@@ -581,6 +591,7 @@ function viewJoin(pre){
    ============================================================ */
 function viewPlay(code,pid){
   clearView();
+  let lastKey=null;   // 다른 조의 변화로 입력칸이 새로 그려지지 않도록
   let room=null, lastStage=null, showBonus=false;
   S.presence('rooms/'+code+'/players/'+pid);
   function myCards(stage,players,me){
@@ -598,6 +609,7 @@ function viewPlay(code,pid){
     const m=room.meta, me=(room.players||{})[pid];
     if(!me){app.innerHTML='<p>입장 정보가 없습니다.</p>';return}
     const g=(room.groups||{})[me.group]||{stage:0}, now=S.now(), stage=g.stage||0;
+    if(m.state!=='running'||stage>=MAIN)lastKey=null;   // 대기·탈출 화면은 언제나 새로 그림
     if(m.state==='lobby'){
       const mates=Object.values(room.players||{}).filter(p=>p.group===me.group).sort((a,b)=>a.joinedAt-b.joinedAt);
       app.innerHTML=`${modeBanner()}<div class="hero"><div class="dim">${esc(m.name)} · ${me.group}조</div>
@@ -623,6 +635,11 @@ function viewPlay(code,pid){
       const bn=$('#bn');if(bn)bn.onclick=()=>{showBonus=true;render()};
       return;
     }
+    /* 다른 조 기록이 바뀌어도 우리 조 화면 내용이 같으면 다시 그리지 않습니다. */
+    const key=JSON.stringify([m.state,stage,showBonus,(g.lockUntil||0)>now,(g.hints||{})[Math.min(stage,STAGES.length-1)]||0,g.seed||0,
+      Object.values(room.players||{}).filter(p=>p.group===me.group&&p.online!==false).map(p=>p.name).join('|')]);
+    if(key===lastKey&&app.querySelector('#an'))return;
+    lastKey=key;
     const cur=Math.min(stage,STAGES.length-1), s=stageOf(cur,g.seed||0);
     if(location.protocol==='file:')window.__cur=s;   // 내 컴퓨터에서 점검할 때만
     const {mates,cards}=myCards(cur,room.players||{},me);
