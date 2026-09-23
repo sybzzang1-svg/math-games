@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;600;700&family=East+Sea+Dokdo&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../engine/escape.css?v=2">
+<link rel="stylesheet" href="../engine/escape.css?v=4">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
@@ -19,7 +19,7 @@
 const GAME = {
   id:'triquad', title:'진해중 폐교 탈출', subtitle:'삼각형과 사각형 편',
   intro:'오래전 문을 닫은 옛 진해중학교 건물. 정신을 차리니 정문이 잠겨 있다. 삼각형과 사각형의 성질로 잠긴 문 네 개를 열고, 교장실 금고에서 정문 열쇠를 찾아 탈출하라. 한 사람씩 도전하는 개인전이다. 학생마다 숫자가 다르다.',
-  classLabel:'2학년 3반', roomExample:'2학년 3반 삼각형', lockMs:20000
+  classLabel:'2학년 3반', roomExample:'2학년 3반 삼각형', lockMs:10000
 };
 /* 무작위 범위 설계 — 금고 암호(정사각형)를 지키기 위해 정답 범위가 겹치지 않게 했습니다
    2번 문 3·4·6  <  4번 문 8~11  <  1번 문 12~60  <  3번 문 110~140 */
@@ -141,6 +141,6 @@ const STAGES = [
         explain:`<b>풀이</b> △PAB + △PCD = ½ × ${T} = ${h}이므로 △PCD = ${h} − ${x} = ${h-x}. △PBC의 넓이는 필요 없는 정보였습니다.` }; } }
 ];
 </script>
-<script src="../engine/escape.js?v=2"></script>
+<script src="../engine/escape.js?v=4"></script>
 </body>
 </html>
