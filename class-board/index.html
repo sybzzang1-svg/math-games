@@ -191,7 +191,7 @@ const normRatio=v=>String(v||'').replace(/\s|대/g,':').replace(/:+/g,':').repla
 const normNum=v=>String(v||'').replace(/[^\d.\-]/g,'');
 function norm(f,v){return f.kind==='ratio'?normRatio(v):f.kind==='num'?normNum(v):String(v||'').trim()}
 function correct(f,v){return norm(f,v)===f.ans}
-const roomPath=(cls,no)=>'rooms/c'+cls+'-'+no;
+const roomPath=(cls,no)=>'rooms/'+(cls*1000+no*10);   // 1반 33차시 → 1330 · 2반 33차시 → 2330
 
 /* ── 화면 ────────────────────────────────────────────────── */
 const V=document.getElementById('view');
