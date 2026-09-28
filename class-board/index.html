@@ -158,30 +158,31 @@ async function initStore(){
 /* ── 차시 목록 ───────────────────────────────────────────── */
 const TEACH_PIN='2026';                 // 교사 화면 잠금 (바꾸려면 여기만 고치세요)
 const CLASSES=[1,2];
-const GROUPS=[1,2,3,4,5,6];
+const GROUPS=[1,2,3,4,5];        // 1·2반 모두 5모둠 (2026-09-28)
 const NCH={1:'①',2:'②',3:'③',4:'④',5:'⑤'};
+const SCRIBE=3;                  // 기기를 가진 사람은 ③ 기록이 한 명뿐
 const ROLE={1:'이끔이',2:'점검이',3:'기록이',4:'발표이',5:'연결이'};
-const RAD={1:[2,3],2:[4,6],3:[6,9],4:[8,12],5:[10,15],6:[12,18]};
+const RAD={1:[2,3],2:[4,6],3:[6,9],4:[8,12],5:[10,15]};
 
 const LESSONS={
   33:{ no:33, name:'닮은 도형', book:'교과서 193~196쪽', ready:true, stages:[
     { key:'s1', tab:'① 함께하기', title:'함께하기 — 세 쌍의 대응변의 비',
-      lead:'모눈 칸수를 세어 구한 세 비와, 대응각을 비교한 결과를 올립니다.',
+      lead:'모눈 칸수를 세어 구한 세 비와 대응각 비교를 ③ 기록이가 올립니다.',
       fields:[ {k:'ab',lab:'AB : DE',ph:'1:2',who:1,kind:'ratio',ans:'1:2'},
                {k:'bc',lab:'BC : EF',ph:'1:2',who:2,kind:'ratio',ans:'1:2'},
                {k:'ca',lab:'CA : FD',ph:'1:2',who:3,kind:'ratio',ans:'1:2'},
                {k:'ang',lab:'대응각 세 쌍',ph:'=',who:4,kind:'pick',opts:['=','≠'],ans:'='} ],
       concl:'세 비가 모두 1 : 2 로 같습니다.  대응변의 길이의 비 — 닮음비 — 는 일정합니다.' },
     { key:'s2', tab:'② 두 원', title:'두 원의 닮음비',
-      lead:'모둠마다 반지름이 다릅니다. 간단한 자연수 비로 고쳐 올립니다.',
-      fields:[ {k:'rr',lab:'우리 모둠 닮음비',ph:'2:3',who:1,kind:'ratio',ans:'2:3'} ],
+      lead:'모둠마다 반지름이 다릅니다. 간단한 자연수 비로 고쳐 ③ 기록이가 올립니다.',
+      fields:[ {k:'rr',lab:'우리 모둠 닮음비',ph:'2:3',who:5,kind:'ratio',ans:'2:3'} ],
       extra:g=>'반지름 '+RAD[g][0]+' cm , '+RAD[g][1]+' cm',
       concl:'반지름이 모둠마다 다른데 닮음비는 모두 2 : 3.  비는 크기가 아니라 관계입니다.' },
     { key:'s3', tab:'③ 문제 2', title:'문제 2 — □ABCD ∽ □EFGH',
-      lead:'세 답을 ④번이 검산한 뒤 ①번이 올립니다.',
+      lead:'④ 가 검산한 뒤 ③ 기록이가 올립니다.',
       fields:[ {k:'q1',lab:'⑴ 닮음비',ph:'4:3',who:1,kind:'ratio',ans:'4:3'},
                {k:'q2',lab:'⑵ GH (cm)',ph:'6',who:2,kind:'num',ans:'6'},
-               {k:'q3',lab:'⑶ ∠H (도)',ph:'118',who:3,kind:'num',ans:'118'} ],
+               {k:'q3',lab:'⑶ ∠H (도)',ph:'118',who:5,kind:'num',ans:'118'} ],
       concl:'닮음비 4 : 3 ,  GH = 6 cm ,  ∠H = 118°' }
   ]},
   34:{ no:34, name:'닮음비와 넓이의 비', book:'교과서 197~198쪽', ready:false },
@@ -214,7 +215,7 @@ function viewLessons(){
     </button>`).join('');
   V.append($(`<div class="card">
     <h2>오늘 할 차시를 누르세요</h2>
-    <p class="d">누르면 우리 반 · 모둠 · 내 번호를 고르는 화면이 나옵니다. 이 주소는 앞으로 계속 씁니다.</p>
+    <p class="d">기기는 <b>모둠에 한 대</b>, <b>③ 기록이</b>만 씁니다. 누르면 우리 반과 모둠을 고르는 화면이 나옵니다. 이 주소는 앞으로 계속 씁니다.</p>
     <div class="lessons">${list}</div>
   </div>`));
   V.append($(`<div style="text-align:center"><button class="btn sm" id="tb">교사 화면</button></div>`));
@@ -227,27 +228,24 @@ function viewSeat(no){
   const L=LESSONS[no]; if(!L||!L.ready)return viewLessons();
   clearView(); showHome(true); crumb(no+'차시 · '+L.name);
   const saved=JSON.parse(localStorage.getItem('mb_me_'+no)||'null');
-  if(saved)return viewStudent(no,saved);
-  let cls=null,g=null,n=null;
+  if(saved){saved.n=SCRIBE;return viewStudent(no,saved);}
+  let cls=null,g=null;
   const c=$(`<div class="card">
     <h2>${no}차시 · ${esc(L.name)}</h2>
-    <p class="d">명찰에 적힌 번호를 고르세요. 한 번 고르면 다음부터는 바로 들어옵니다.</p>
+    <div class="msg g"><b>${NCH[SCRIBE]} 기록이</b> 한 명만 들어옵니다. 모둠에 기기는 한 대뿐입니다.</div>
+    <p class="d">우리 반과 모둠을 고르세요. 한 번 고르면 다음 차시부터는 바로 들어옵니다.</p>
     <label>반</label>
     <div class="pick" id="pc">${CLASSES.map(x=>`<button data-c="${x}">${x}반</button>`).join('')}</div>
     <label style="margin-top:14px">모둠</label>
     <div class="pick" id="pg">${GROUPS.map(x=>`<button data-g="${x}">${x}모둠</button>`).join('')}</div>
-    <label style="margin-top:14px">내 번호</label>
-    <div class="pick n" id="pn">${[1,2,3,4,5].map(x=>`<button data-n="${x}" style="--c:var(--n${x})">${NCH[x]}<br><span style="font-size:11px;font-weight:500">${ROLE[x]}</span></button>`).join('')}</div>
     <div style="margin-top:16px"><button class="btn p" id="ok" disabled>들어가기</button></div>
   </div>`);
   V.append(c);
-  const ok=c.querySelector('#ok'), upd=()=>ok.disabled=!(cls&&g&&n);
-  const sel=(box,b,color)=>box.querySelectorAll('button').forEach(x=>{const on=x===b;x.setAttribute('aria-pressed',String(on));
-    if(color){x.style.background=on?getComputedStyle(x).getPropertyValue('--c'):'';x.style.borderColor=on?getComputedStyle(x).getPropertyValue('--c'):''}});
+  const ok=c.querySelector('#ok'), upd=()=>ok.disabled=!(cls&&g);
+  const sel=(box,b)=>box.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
   c.querySelectorAll('#pc button').forEach(b=>b.onclick=()=>{cls=+b.dataset.c;sel(c.querySelector('#pc'),b);upd()});
   c.querySelectorAll('#pg button').forEach(b=>b.onclick=()=>{g=+b.dataset.g;sel(c.querySelector('#pg'),b);upd()});
-  c.querySelectorAll('#pn button').forEach(b=>b.onclick=()=>{n=+b.dataset.n;sel(c.querySelector('#pn'),b,true);upd()});
-  ok.onclick=()=>{const me={cls,g,n};localStorage.setItem('mb_me_'+no,JSON.stringify(me));viewStudent(no,me)};
+  ok.onclick=()=>{const me={cls,g,n:SCRIBE};localStorage.setItem('mb_me_'+no,JSON.stringify(me));viewStudent(no,me)};
 }
 
 async function viewStudent(no,me){
@@ -266,7 +264,7 @@ async function viewStudent(no,me){
     const stage=(room&&room.meta&&room.meta.stage)||0;
     const st=L.stages[stage];
     const mine=(room&&room.groups&&room.groups[me.g]&&room.groups[me.g][st.key])||{};
-    const canPost=me.n===1;
+    const canPost=me.n===SCRIBE;
     body.innerHTML=`<div class="card">
       <h2>${esc(st.title)}</h2>
       <p class="d">${esc(st.lead)}</p>
@@ -281,7 +279,7 @@ async function viewStudent(no,me){
         <button class="btn p" id="send" ${canPost?'':'disabled'}>우리 모둠 값 올리기</button>
         <button class="btn" id="hand">도움 요청</button>
       </div>
-      ${canPost?'':'<div class="note">올리는 사람은 ①번입니다. 값은 함께 정하고 ①번이 올립니다.</div>'}
+      ${canPost?'':'<div class="note">올리는 사람은 ③ 기록이입니다.</div>'}
       ${mine.at?'<div class="msg g">올렸습니다 — 선생님 화면에서 함께 봅니다.</div>':''}
     </div>`;
     body.querySelectorAll('.pick[data-k] button').forEach(b=>b.onclick=()=>{
@@ -307,7 +305,7 @@ function viewTeacherGate(){
   clearView(); showHome(true); crumb('교사 화면');
   V.append($(`<div class="card">
     <h2>교사 화면</h2>
-    <p class="d">학생이 실수로 지우지 않도록 잠가 두었습니다.</p>
+    <p class="d">학생이 실수로 지우지 않도록 잠가 두었습니다. 열면 <b>반 → 차시</b> 를 고르고, 그 화면을 교실 큰 화면에 띄웁니다.</p>
     <div class="row">
       <div><label for="pin">잠금 번호</label><input id="pin" type="password" inputmode="numeric" placeholder="••••"></div>
       <div style="flex:0 0 auto"><button class="btn p" id="pg2">열기</button></div>
@@ -343,7 +341,7 @@ async function viewBoard(cls,no){
       <div id="qrbox"></div>
       <div><div class="mini">학생 접속 주소 — 이 QR 은 계속 씁니다</div>
       <div style="font-weight:700;font-size:17px;margin-top:2px">${esc(joinUrl)}</div>
-      <div class="mini" style="margin-top:4px">들어와서 <b>${no}차시</b> 를 누르면 됩니다.</div></div>
+      <div class="mini" style="margin-top:4px">모둠의 <b>③ 기록이</b>가 찍고 <b>${no}차시</b> → 반 → 모둠 을 누릅니다.</div></div>
     </div></div>`));
   try{new QRCode(document.getElementById('qrbox'),{text:joinUrl,width:124,height:124,correctLevel:QRCode.CorrectLevel.M})}catch(e){}
   const tabs=$(`<div class="tabs">${L.stages.map((st,i)=>`<button data-i="${i}">${st.tab}</button>`).join('')}
